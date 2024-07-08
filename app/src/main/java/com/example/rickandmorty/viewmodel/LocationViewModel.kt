@@ -13,14 +13,19 @@ class LocationViewModel : ViewModel() {
     var state by mutableStateOf(LocationScreenState())
     init {
         viewModelScope.launch {
-            val response = repository.getLocationList()
+            val response = repository.getLocationList(state.page)
             state = state.copy(
                 locations = response.body()!!.results
             )
         }
     }
+    fun updateSearchQuery(query: String) {
+        state = state.copy(searchQuery = query)
+    }
 }
 
 data class LocationScreenState(
     val locations: List<Location> = emptyList(),
+    val searchQuery: String = "",
+    val page: Int = 1
 )

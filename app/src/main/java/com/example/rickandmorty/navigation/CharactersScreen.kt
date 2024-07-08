@@ -1,6 +1,7 @@
 package com.example.rickandmorty.navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,18 +15,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,7 +38,7 @@ fun CharactersScreen(navController: NavHostController) {
     Scaffold(
         modifier = Modifier.background(Color.Transparent),
         topBar = {
-            TopBar()
+            TopBar("Characters")
         },
         content = { paddingValues ->
             Column(
@@ -51,18 +47,20 @@ fun CharactersScreen(navController: NavHostController) {
                     .background(Color.Transparent)
                     .padding(paddingValues),
             ) {
-                SearchBar(characterViewModel)
+                SearchBar(
+                    characterViewModel.state.searchQuery,
+                    {characterViewModel.updateSearchQuery(it)},
+                    "Search Characters")
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(1),
                     Modifier
-                        .padding(paddingValues)
                         .fillMaxSize()
                         .background(
                             Color.Transparent
                         ),
                     content = {
                         val filteredCharacters = state.characters.filter { character ->
-                            character.name?.contains(state.searchQuery, ignoreCase = true) ?: false
+                            character.name.contains(state.searchQuery, ignoreCase = true)
                         }
                         items(filteredCharacters.size) { index ->
                             CharacterUI(
@@ -82,7 +80,8 @@ fun CharacterUI(character: Character, navController: NavHostController) {
     Card(
         Modifier
             .wrapContentSize()
-            .padding(10.dp),
+            .padding(10.dp)
+            .clickable { navController.navigate("Character Details/${character.id}") },
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth().background(Color.White)) {
@@ -100,7 +99,7 @@ fun CharacterUI(character: Character, navController: NavHostController) {
                     .padding(horizontal = 6.dp),
             ) {
                 Text(
-                    text = character.name!!,
+                    text = character.name,
                     modifier = Modifier.padding(horizontal = 6.dp),
                     fontWeight = FontWeight.Bold
                 )
@@ -110,7 +109,7 @@ fun CharacterUI(character: Character, navController: NavHostController) {
                     fontSize = 10.sp
                 )
                 Text(
-                    text = character.origin!!.name!!,
+                    text = character.origin.name,
                     modifier = Modifier.padding(horizontal = 6.dp),
                     fontSize = 12.sp
                 )
@@ -120,7 +119,7 @@ fun CharacterUI(character: Character, navController: NavHostController) {
                     fontSize = 10.sp
                 )
                 Text(
-                    text = character.status!! + " - " + character.species!!,
+                    text = character.status + " - " + character.species,
                     modifier = Modifier.padding(horizontal = 6.dp),
                     fontSize = 12.sp
                 )
@@ -128,28 +127,4 @@ fun CharacterUI(character: Character, navController: NavHostController) {
         }
         
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar() {
-    TopAppBar(
-        title = { Text(text = "Characters") },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White.copy(.4f)
-        )
-    )
-}
-
-@Composable
-fun SearchBar(characterViewModel: CharacterViewModel) {
-    TextField(
-        value = characterViewModel.state.searchQuery,
-        onValueChange = { characterViewModel.updateSearchQuery(it) },
-        placeholder = { Text("Search Characters") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        textStyle = TextStyle(color = Color.White)
-    )
 }
