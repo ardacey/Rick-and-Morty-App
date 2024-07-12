@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.LocationOn
@@ -13,16 +14,17 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -40,17 +42,24 @@ fun Navigation(){
             composable("characters") { CharactersScreen(navController) }
             composable("locations") { LocationsScreen(navController) }
             composable("episodes") { EpisodesScreen(navController) }
+            composable(
+                "Character Details/{characterId}",
+                arguments = listOf(navArgument("characterId") { type = NavType.IntType })
+            ) {
+                id -> CharacterDetailsScreen(id.arguments?.getInt("characterId"))
+            }
         }
     }
 }
 
 @Composable
 fun BottomNavigationBar(navController: NavController, items: List<BottomNavItem>) {
-    BottomAppBar{
+    BottomAppBar(
+        modifier = Modifier.height(75.dp)
+    ){
         Row(
             horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
             items.forEach { item ->
                 Column(
@@ -59,7 +68,6 @@ fun BottomNavigationBar(navController: NavController, items: List<BottomNavItem>
                     IconButton(onClick = { navController.navigate(item.route) }) {
                         Icon(imageVector = item.icon, contentDescription = item.title)
                     }
-                    Text(text = item.title, fontSize = 10.sp)
                 }
             }
         }

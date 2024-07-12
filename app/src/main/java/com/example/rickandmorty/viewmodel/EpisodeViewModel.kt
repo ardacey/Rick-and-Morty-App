@@ -13,7 +13,7 @@ class EpisodeViewModel : ViewModel()  {
     var state by mutableStateOf(EpisodeScreenState())
     init {
         viewModelScope.launch {
-            val response = repository.getEpisodeList()
+            val response = repository.getEpisodeList(state.page)
             state = state.copy(
                 episodes = response.body()!!.results
             )
@@ -23,4 +23,6 @@ class EpisodeViewModel : ViewModel()  {
 
 data class EpisodeScreenState(
     val episodes: List<Episode> = emptyList(),
+    val searchQuery: String = "",
+    val page: Int = 1
 )
