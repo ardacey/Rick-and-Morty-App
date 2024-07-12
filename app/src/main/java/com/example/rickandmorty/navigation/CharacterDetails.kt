@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,23 +25,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.rickandmorty.viewmodel.CharacterViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import com.example.rickandmorty.model.Episode
+import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
 
 @Composable
 fun CharacterDetailsScreen(id : Int?) {
-    val characterViewModel = viewModel<CharacterViewModel>()
-    characterViewModel.id = id!!
-    characterViewModel.getCharacter()
-    val state = characterViewModel.state
-    val character = state.character
+    val characterDetailsViewModel = viewModel<CharacterDetailsViewModel>()
+    characterDetailsViewModel.getCharacter(id!!)
+    val character = characterDetailsViewModel.state.character
 
-    Box(
+    LazyColumn(
         modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+        item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -59,7 +60,7 @@ fun CharacterDetailsScreen(id : Int?) {
                     contentDescription = character.name,
                     modifier = Modifier
                         .size(150.dp)
-                        .clip(RoundedCornerShape(10.dp)),
+                        .clip(CircleShape),
                 )
             }
             Text(
@@ -73,27 +74,96 @@ fun CharacterDetailsScreen(id : Int?) {
                 fontSize = 16.sp,
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
 
             ) {
+                Column (horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = character.species,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "Species",
+                        fontSize = 12.sp,
+                    )
+                }
+
+                Column (horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = character.gender,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "Gender",
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)) {
                 Text(
-                    text = character.species,
-                    fontSize = 20.sp,
+                    text = character.location.name,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = character.gender,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    text = "Location",
+                    fontSize = 12.sp,
                 )
             }
-            Text(
-                text = character.location.name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(16.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Text(
+                    text = "Episodes (${character.episode.size})",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(12.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CharacterEpisode(episode: Episode) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Face,
+                contentDescription = null,
+                modifier = Modifier.padding(horizontal = 8.dp).size(48.dp)
             )
+            Column {
+                Text(
+                    text = episode.episode,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = episode.name,
+                    fontSize = 16.sp,
+                )
+            }
         }
     }
 }

@@ -2,7 +2,9 @@ package com.example.rickandmorty.viewmodel
 
 import com.example.rickandmorty.model.CharacterList
 import com.example.rickandmorty.model.Character
+import com.example.rickandmorty.model.Episode
 import com.example.rickandmorty.model.EpisodeList
+import com.example.rickandmorty.model.Location
 import com.example.rickandmorty.model.LocationList
 import com.example.rickandmorty.util.RetrofitCharacterInstance
 import com.example.rickandmorty.util.RetrofitEpisodeInstance
@@ -22,7 +24,16 @@ class Repository {
         return RetrofitLocationInstance.api.getLocations(page)
     }
 
+    suspend fun getLocation(id: Int): Response<Location>{
+        return RetrofitLocationInstance.api.getLocation(id)
+    }
+
     suspend fun getEpisodeList(page: Int): Response<EpisodeList>{
         return RetrofitEpisodeInstance.api.getEpisodes(page)
     }
+
+    suspend fun getEpisode(id: Int): Response<Episode>{
+        return RetrofitEpisodeInstance.api.getEpisode(id)
+    }
+
 }

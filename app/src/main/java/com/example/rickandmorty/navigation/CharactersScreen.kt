@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,9 +36,7 @@ fun CharactersScreen(navController: NavHostController) {
     val state = characterViewModel.state
     Scaffold(
         modifier = Modifier.background(Color.Transparent),
-        topBar = {
-            TopBar("Characters")
-        },
+        topBar = { TopBar("Characters") },
         content = { paddingValues ->
             Column(
                 modifier = Modifier
@@ -51,22 +48,16 @@ fun CharactersScreen(navController: NavHostController) {
                     characterViewModel.state.searchQuery,
                     {characterViewModel.updateSearchQuery(it)},
                     "Search Characters")
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(1),
-                    Modifier
-                        .fillMaxSize()
-                        .background(
-                            Color.Transparent
-                        ),
+                LazyColumn(
+                    Modifier.fillMaxSize(),
                     content = {
                         val filteredCharacters = state.characters.filter { character ->
                             character.name.contains(state.searchQuery, ignoreCase = true)
                         }
                         items(filteredCharacters.size) { index ->
                             CharacterUI(
-                                character = filteredCharacters[index],
-                                navController = navController
-                            )
+                                character = filteredCharacters[index]
+                            ) { navController.navigate("Character Details/${filteredCharacters[index].id}") }
                         }
                     }
                 )
@@ -76,12 +67,12 @@ fun CharactersScreen(navController: NavHostController) {
 }
 
 @Composable
-fun CharacterUI(character: Character, navController: NavHostController) {
+private fun CharacterUI(character: Character, onClick: () -> Unit = { }) {
     Card(
         Modifier
             .wrapContentSize()
             .padding(10.dp)
-            .clickable { navController.navigate("Character Details/${character.id}") },
+            .clickable { onClick.invoke() },
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth().background(Color.White)) {
@@ -125,6 +116,5 @@ fun CharacterUI(character: Character, navController: NavHostController) {
                 )
             }
         }
-        
     }
 }
