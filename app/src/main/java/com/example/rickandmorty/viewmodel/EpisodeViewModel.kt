@@ -12,13 +12,14 @@ class EpisodeViewModel : ViewModel()  {
     private val repository = Repository()
     var state by mutableStateOf(EpisodeScreenState())
 
-    init { getResponse(state.page) }
+    init { getEpisode() }
 
     fun updateSearchQuery(query: String) {
         state = state.copy(searchQuery = query)
     }
 
-    private fun getResponse(page : Int) {
+
+    private fun getEpisode() {
         viewModelScope.launch {
             val response = repository.getEpisodeList(state.page)
             state = state.copy(

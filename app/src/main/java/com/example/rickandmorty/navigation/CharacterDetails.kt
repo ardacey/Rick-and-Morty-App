@@ -29,12 +29,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import com.example.rickandmorty.model.Episode
 import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
+import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
 
 @Composable
 fun CharacterDetailsScreen(id : Int?) {
     val characterDetailsViewModel = viewModel<CharacterDetailsViewModel>()
     characterDetailsViewModel.getCharacter(id!!)
     val character = characterDetailsViewModel.state.character
+
+    val episodeIDs = character.episode.map { it.substringAfterLast("/").toInt() }
+    val characterEpisodeViewModel = CharacterEpisodeViewModel(episodeIDs)
+    val episodes = characterEpisodeViewModel.state.episodes
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -132,6 +137,9 @@ fun CharacterDetailsScreen(id : Int?) {
                     modifier = Modifier.padding(12.dp),
                 )
             }
+        }
+        items(episodes.size) { index ->
+            CharacterEpisode(episodes[index])
         }
     }
 }

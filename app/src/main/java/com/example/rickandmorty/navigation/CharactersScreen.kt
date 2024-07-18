@@ -2,6 +2,7 @@ package com.example.rickandmorty.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +47,7 @@ fun CharactersScreen(navController: NavHostController) {
                     .padding(paddingValues),
             ) {
                 SearchBar(
-                    characterViewModel.state.searchQuery,
+                    state.searchQuery,
                     {characterViewModel.updateSearchQuery(it)},
                     "Search Characters")
                 LazyColumn(
@@ -55,9 +57,30 @@ fun CharactersScreen(navController: NavHostController) {
                             character.name.contains(state.searchQuery, ignoreCase = true)
                         }
                         items(filteredCharacters.size) { index ->
+                            if (index >= state.characters.size - 1 && !state.endOfPaginationReached) {
+                                characterViewModel.loadNextPage()
+                            }
                             CharacterUI(
                                 character = filteredCharacters[index]
                             ) { navController.navigate("Character Details/${filteredCharacters[index].id}") }
+                        }
+                        item {
+                            if (state.isLoading) {
+                                Row(
+                                    Modifier.fillMaxWidth().padding(16.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                            if (state.error != null) {
+                                Row(
+                                    Modifier.fillMaxWidth().padding(16.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Text(state.error)
+                                }
+                            }
                         }
                     }
                 )
