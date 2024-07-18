@@ -47,7 +47,7 @@ fun CharactersScreen(navController: NavHostController) {
                     .padding(paddingValues),
             ) {
                 SearchBar(
-                    characterViewModel.state.searchQuery,
+                    state.searchQuery,
                     {characterViewModel.updateSearchQuery(it)},
                     "Search Characters")
                 LazyColumn(
