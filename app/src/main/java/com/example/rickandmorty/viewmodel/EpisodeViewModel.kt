@@ -20,7 +20,7 @@ class EpisodeViewModel : ViewModel()  {
         state = state.copy(searchQuery = query)
     }
 
-    fun getEpisode() {
+    private fun getEpisode() {
         viewModelScope.launch {
             val response = repository.getEpisodeList(state.page)
             state = state.copy(
