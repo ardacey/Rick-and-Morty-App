@@ -1,7 +1,6 @@
 package com.example.rickandmorty.viewmodel
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -12,13 +11,13 @@ import kotlinx.coroutines.launch
 class EpisodeViewModel : ViewModel()  {
     private val repository = Repository()
     var state by mutableStateOf(EpisodeScreenState())
-    var id by mutableIntStateOf(0)
 
     init { getEpisode() }
 
     fun updateSearchQuery(query: String) {
         state = state.copy(searchQuery = query)
     }
+
 
     private fun getEpisode() {
         viewModelScope.launch {
