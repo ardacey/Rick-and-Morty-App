@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.LocationOn
@@ -38,15 +39,35 @@ fun Navigation(){
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController, items = items) }
     ) {
-        NavHost(navController = navController, startDestination = "characters") {
+        innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "characters",
+            modifier = Modifier.padding(innerPadding)
+        ) {
             composable("characters") { CharactersScreen(navController) }
             composable("locations") { LocationsScreen(navController) }
             composable("episodes") { EpisodesScreen(navController) }
+
             composable(
                 "Character Details/{characterId}",
                 arguments = listOf(navArgument("characterId") { type = NavType.IntType })
             ) {
-                id -> CharacterDetailsScreen(id.arguments?.getInt("characterId"))
+                id -> CharacterDetailsScreen(id.arguments?.getInt("characterId"), navController)
+            }
+
+            composable(
+                "Location Details/{locationId}",
+                arguments = listOf(navArgument("locationId") { type = NavType.IntType })
+            ) { id ->
+                LocationDetailsScreen(id.arguments?.getInt("locationId"), navController)
+            }
+
+            composable(
+                "Episode Details/{episodeId}",
+                arguments = listOf(navArgument("episodeId") { type = NavType.IntType })
+            ) { id ->
+                EpisodeDetailsScreen(id.arguments?.getInt("episodeId"), navController)
             }
         }
     }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,20 +24,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import com.example.rickandmorty.model.Episode
+import androidx.navigation.NavController
 import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
 import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
 
 @Composable
-fun CharacterDetailsScreen(id : Int?) {
+fun CharacterDetailsScreen(id : Int?, navController: NavController?) {
     val characterDetailsViewModel = viewModel<CharacterDetailsViewModel>()
     characterDetailsViewModel.getCharacter(id!!)
     val character = characterDetailsViewModel.state.character
 
-    val episodeIDs = character.episode.map { it.substringAfterLast("/").toInt() }
-    val characterEpisodeViewModel = CharacterEpisodeViewModel(episodeIDs)
+    val characterEpisodeViewModel = viewModel<CharacterEpisodeViewModel>()
+    characterEpisodeViewModel.getEpisodes(character.episode)
     val episodes = characterEpisodeViewModel.state.episodes
 
     LazyColumn(
@@ -139,39 +136,9 @@ fun CharacterDetailsScreen(id : Int?) {
             }
         }
         items(episodes.size) { index ->
-            CharacterEpisode(episodes[index])
-        }
-    }
-}
-
-@Composable
-fun CharacterEpisode(episode: Episode) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Face,
-                contentDescription = null,
-                modifier = Modifier.padding(horizontal = 8.dp).size(48.dp)
-            )
-            Column {
-                Text(
-                    text = episode.episode,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = episode.name,
-                    fontSize = 16.sp,
-                )
-            }
+            EpisodeCard(
+                episodes[index]
+            ) { navController?.navigate("Episode Details/${episodes[index].id}") }
         }
     }
 }
