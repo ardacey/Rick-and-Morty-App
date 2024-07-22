@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Episode
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 class EpisodeViewModel : ViewModel()  {
@@ -18,19 +20,27 @@ class EpisodeViewModel : ViewModel()  {
         state = state.copy(searchQuery = query)
     }
 
-
     private fun getEpisode() {
         viewModelScope.launch {
-            val response = repository.getEpisodeList(state.page)
-            state = state.copy(
-                episodes = response.body()!!.results
-            )
+            val allEpisodes = mutableListOf<Episode>()
+            val firstPageResponse = repository.getEpisodeList(1)
+            val totalPages = firstPageResponse.body()?.info?.pages ?: 1
+
+            val deferredList = (1..totalPages).map { currentPage ->
+                async {
+                    val response = repository.getEpisodeList(currentPage)
+                    response.body()?.results.orEmpty()
+                }
+            }
+
+            val episodeList = deferredList.awaitAll().flatten()
+            allEpisodes.addAll(episodeList)
+            state = state.copy(episodes = allEpisodes)
         }
     }
 }
 
 data class EpisodeScreenState(
     val episodes: List<Episode> = emptyList(),
-    val searchQuery: String = "",
-    val page: Int = 1,
+    val searchQuery: String = ""
 )

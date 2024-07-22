@@ -58,6 +58,16 @@ fun CharactersScreen(navController: NavHostController) {
                             character.name.contains(state.searchQuery, ignoreCase = true)
                         }
                         items(filteredCharacters.size) { index ->
+                            CharacterUI(
+                                character = filteredCharacters[index]
+                            ) { navController.navigate("Character Details/${filteredCharacters[index].id}") }
+                        }
+                    }
+                    /*content = {
+                        val filteredCharacters = state.characters.filter { character ->
+                            character.name.contains(state.searchQuery, ignoreCase = true)
+                        }
+                        items(filteredCharacters.size) { index ->
                             if (index >= state.characters.size - 1 && !state.endOfPaginationReached) {
                                 characterViewModel.loadNextPage()
                             }
@@ -83,7 +93,7 @@ fun CharactersScreen(navController: NavHostController) {
                                 }
                             }
                         }
-                    }
+                    }*/
                 )
             }
         }
