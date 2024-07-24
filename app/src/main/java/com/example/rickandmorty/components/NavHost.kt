@@ -1,33 +1,25 @@
-package com.example.rickandmorty.navigation
+package com.example.rickandmorty.components
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.rickandmorty.navigation.CharacterDetailsScreen
+import com.example.rickandmorty.navigation.CharactersScreen
+import com.example.rickandmorty.navigation.EpisodeDetailsScreen
+import com.example.rickandmorty.navigation.EpisodesScreen
+import com.example.rickandmorty.navigation.LocationDetailsScreen
+import com.example.rickandmorty.navigation.LocationsScreen
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Navigation(){
     val navController = rememberNavController()
@@ -72,27 +64,3 @@ fun Navigation(){
         }
     }
 }
-
-@Composable
-fun BottomNavigationBar(navController: NavController, items: List<BottomNavItem>) {
-    BottomAppBar(
-        modifier = Modifier.height(75.dp)
-    ){
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items.forEach { item ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    IconButton(onClick = { navController.navigate(item.route) }) {
-                        Icon(imageVector = item.icon, contentDescription = item.title)
-                    }
-                }
-            }
-        }
-    }
-}
-
-data class BottomNavItem(val title: String, val icon: ImageVector, val route: String)

@@ -3,45 +3,23 @@ package com.example.rickandmorty.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Character
+import com.example.rickandmorty.repository.CharacterDownload
+import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
-class CharacterViewModel : ViewModel() {
-    private val repository = Repository()
+class CharacterViewModel(
+    private val repository: CharacterDownload
+) : ViewModel() {
+
     var state by mutableStateOf(CharacterScreenState())
-
-    /*private val pagination = PaginationFactory(
-        initialPage = state.page,
-        onLoadUpdated = { isLoading ->
-            state = state.copy(isLoading = isLoading)
-        },
-        onRequest = { page ->
-            repository.getCharacterList(page)
-        },
-        getNextPage = { state.page + 1 },
-        onError = {
-            state = state.copy(error = it?.localizedMessage)
-        },
-        onSuccess = { items, newPage ->
-            state = state.copy(
-                characters = state.characters + items.results,
-                page = newPage,
-                endOfPaginationReached = state.page == items.info.pages
-            )
-        }
-    )
-
-    init { loadNextPage() }
-
-    fun loadNextPage() {
-        viewModelScope.launch {
-            pagination.loadNextItems()
-        }
-    }*/
+    val error = MutableLiveData<Resource<Exception>>()
+    val isLoading = MutableLiveData<Resource<Boolean>>()
 
     init { getCharacter() }
 
@@ -49,22 +27,30 @@ class CharacterViewModel : ViewModel() {
         state = state.copy(searchQuery = query)
     }
 
+    fun updateStatusFilter(filter: String) {
+        state = state.copy(statusFilter = filter)
+    }
+
+    fun updateGenderFilter(filter: String) {
+        state = state.copy(genderFilter = filter)
+    }
+
     private fun getCharacter() {
+        isLoading.value = Resource.loading(true)
         viewModelScope.launch {
-            val allCharacters = mutableListOf<Character>()
             val firstPageResponse = repository.getCharacterList(1)
-            val totalPages = firstPageResponse.body()?.info?.pages ?: 1
+            val totalPages = firstPageResponse.data?.info?.pages ?: 1
 
             val deferredList = (1..totalPages).map { currentPage ->
                 async {
                     val response = repository.getCharacterList(currentPage)
-                    response.body()?.results.orEmpty()
+                    response.data?.results.orEmpty()
                 }
             }
 
+            isLoading.value = Resource.loading(false)
             val characterList = deferredList.awaitAll().flatten()
-            allCharacters.addAll(characterList)
-            state = state.copy(characters = allCharacters)
+            state = state.copy(characters = characterList)
         }
     }
 }
@@ -72,8 +58,13 @@ class CharacterViewModel : ViewModel() {
 data class CharacterScreenState(
     val characters: List<Character> = emptyList(),
     val searchQuery: String = "",
-    /*val page: Int = 1,
-    val endOfPaginationReached: Boolean = false,
-    val error: String? = null,
-    val isLoading: Boolean = false,*/
-)
+    val statusFilter: String = "",
+    val genderFilter: String = "",
+) {
+    val filteredCharacters: List<Character>
+        get() = characters.filter { character ->
+            character.name.contains(searchQuery, ignoreCase = true) &&
+            (statusFilter.isEmpty() || character.status.equals(statusFilter, ignoreCase = true)) &&
+            (genderFilter.isEmpty() || character.gender.equals(genderFilter, ignoreCase = true))
+        }
+}

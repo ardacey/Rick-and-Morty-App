@@ -22,19 +22,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import androidx.navigation.NavController
 import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
 import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CharacterDetailsScreen(id : Int?, navController: NavController?) {
-    val characterDetailsViewModel = viewModel<CharacterDetailsViewModel>()
+    val characterDetailsViewModel = koinViewModel<CharacterDetailsViewModel>()
     characterDetailsViewModel.getCharacter(id!!)
     val character = characterDetailsViewModel.state.character
 
-    val characterEpisodeViewModel = viewModel<CharacterEpisodeViewModel>()
+    val characterEpisodeViewModel = koinViewModel<CharacterEpisodeViewModel>()
     characterEpisodeViewModel.getEpisodes(character.episode)
     val episodes = characterEpisodeViewModel.state.episodes
 

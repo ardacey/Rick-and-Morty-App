@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.rickandmorty.navigation.Navigation
+import com.example.rickandmorty.di.appModule
+import com.example.rickandmorty.components.Navigation
 import com.example.rickandmorty.ui.theme.RickAndMortyTheme
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -18,6 +19,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        startKoin {
+            androidContext(this@MainActivity)
+            modules(appModule)
+        }
         setContent {
             RickAndMortyTheme {
                 Column(

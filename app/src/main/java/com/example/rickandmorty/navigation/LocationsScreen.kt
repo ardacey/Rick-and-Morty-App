@@ -14,20 +14,27 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.rickandmorty.components.LocationBottomSheet
+import com.example.rickandmorty.components.SearchBar
+import com.example.rickandmorty.components.TopBar
 import com.example.rickandmorty.model.Location
 import com.example.rickandmorty.viewmodel.LocationViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LocationsScreen(navController: NavHostController) {
-    val locationViewModel = viewModel<LocationViewModel>()
+    val locationViewModel = koinViewModel<LocationViewModel>()
     val state = locationViewModel.state
+    val showBottomSheet = remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = Modifier.background(Color.Transparent),
         topBar = { TopBar("Locations") },
@@ -41,13 +48,12 @@ fun LocationsScreen(navController: NavHostController) {
                 SearchBar(
                     locationViewModel.state.searchQuery,
                     {locationViewModel.updateSearchQuery(it)},
-                    "Search Locations")
+                    "Search Locations",
+                    showOptionsSheet = { showBottomSheet.value = true })
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     content = {
-                        val filteredLocations = state.locations.filter { location ->
-                            location.name.contains(state.searchQuery, ignoreCase = true)
-                        }
+                        val filteredLocations = state.filteredLocations
                         items(filteredLocations.size) { index ->
                             LocationUI(
                                 location = filteredLocations[index]
@@ -55,6 +61,9 @@ fun LocationsScreen(navController: NavHostController) {
                         }
                     }
                 )
+            }
+            if (showBottomSheet.value) {
+                LocationBottomSheet(onDismissRequest = { showBottomSheet.value = false })
             }
         }
     )
@@ -89,5 +98,4 @@ private fun LocationUI(location: Location, onClick: () -> Unit = { }) {
             )
         }
     }
-
 }

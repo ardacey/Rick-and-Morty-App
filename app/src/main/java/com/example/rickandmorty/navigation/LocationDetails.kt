@@ -16,19 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.rickandmorty.viewmodel.LocationCharacterViewModel
 import com.example.rickandmorty.viewmodel.LocationDetailsViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LocationDetailsScreen(id : Int?, navController: NavController?) {
-    val locationDetailsViewModel = viewModel<LocationDetailsViewModel>()
+    val locationDetailsViewModel = koinViewModel<LocationDetailsViewModel>()
     locationDetailsViewModel.getLocation(id!!)
     val location = locationDetailsViewModel.state.location
 
-    val locationCharacterViewModel = viewModel<LocationCharacterViewModel>()
+    val locationCharacterViewModel = koinViewModel<LocationCharacterViewModel>()
     locationCharacterViewModel.getCharacters(location.residents)
     val characters = locationCharacterViewModel.state.characters
 

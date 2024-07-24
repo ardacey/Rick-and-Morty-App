@@ -17,19 +17,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.rickandmorty.viewmodel.EpisodeCharacterViewModel
 import com.example.rickandmorty.viewmodel.EpisodeDetailsViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EpisodeDetailsScreen(id : Int?, navController: NavController?) {
-    val episodeDetailsViewModel = viewModel<EpisodeDetailsViewModel>()
+    val episodeDetailsViewModel = koinViewModel<EpisodeDetailsViewModel>()
     episodeDetailsViewModel.getEpisode(id!!)
     val episode = episodeDetailsViewModel.state.episode
 
-    val episodeCharacterViewModel = viewModel<EpisodeCharacterViewModel>()
+    val episodeCharacterViewModel = koinViewModel<EpisodeCharacterViewModel>()
     episodeCharacterViewModel.getCharacters(episode.characters)
     val characters = episodeCharacterViewModel.state.characters
 

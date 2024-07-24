@@ -13,20 +13,26 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.rickandmorty.components.EpisodeBottomSheet
+import com.example.rickandmorty.components.SearchBar
+import com.example.rickandmorty.components.TopBar
 import com.example.rickandmorty.model.Episode
 import com.example.rickandmorty.viewmodel.EpisodeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EpisodesScreen(navController: NavHostController) {
-    val episodeViewModel = viewModel<EpisodeViewModel>()
+    val episodeViewModel = koinViewModel<EpisodeViewModel>()
     val state = episodeViewModel.state
+    val showBottomSheet = remember { mutableStateOf(false) }
     
     Scaffold(
         modifier = Modifier.background(Color.Transparent),
@@ -41,13 +47,12 @@ fun EpisodesScreen(navController: NavHostController) {
                 SearchBar(
                     episodeViewModel.state.searchQuery,
                     {episodeViewModel.updateSearchQuery(it)},
-                    "Search Episodes")
+                    "Search Episodes",
+                    showOptionsSheet = { showBottomSheet.value = true })
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     content = {
-                        val filteredEpisodes = state.episodes.filter { episode ->
-                            episode.name.contains(state.searchQuery, ignoreCase = true)
-                        }
+                        val filteredEpisodes = state.filteredEpisodes
                         items(filteredEpisodes.size) { index ->
                             EpisodeUI(
                                 episode = filteredEpisodes[index]
@@ -55,6 +60,9 @@ fun EpisodesScreen(navController: NavHostController) {
                         }
                     }
                 )
+            }
+            if (showBottomSheet.value) {
+                EpisodeBottomSheet(onDismissRequest = { showBottomSheet.value = false })
             }
         }
     )
@@ -84,5 +92,4 @@ private fun EpisodeUI(episode: Episode, onClick: () -> Unit = { }) {
             )
         }
     }
-
 }
