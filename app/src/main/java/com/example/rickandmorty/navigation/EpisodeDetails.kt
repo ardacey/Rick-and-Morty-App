@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.rickandmorty.components.CharacterCard
+import com.example.rickandmorty.components.LoadingIndicator
+import com.example.rickandmorty.components.Screen
 import com.example.rickandmorty.viewmodel.EpisodeCharacterViewModel
 import com.example.rickandmorty.viewmodel.EpisodeDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -32,6 +36,22 @@ fun EpisodeDetailsScreen(
     id : Int?, navController: NavController?,
     episodeViewModel: EpisodeDetailsViewModel = koinViewModel(),
     characterViewModel: EpisodeCharacterViewModel = koinViewModel()) {
+
+    val isCharacterLoading by characterViewModel.isLoading.collectAsState()
+    val episodeError by episodeViewModel.error.collectAsState()
+    val characterError by characterViewModel.error.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(episodeError, characterError) {
+        if (episodeError != null || characterError != null) {
+            val error = episodeError ?: characterError
+            error?.let {
+                snackbarHostState.showSnackbar(message = it.toString())
+                episodeViewModel.clearError()
+                characterViewModel.clearError()
+            }
+        }
+    }
 
     LaunchedEffect(id) {
         id?.let { episodeViewModel.getEpisode(it) }
@@ -85,17 +105,26 @@ fun EpisodeDetailsScreen(
                 fontWeight = FontWeight.Bold
             )
         }
-        item {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                maxItemsInEachRow = 3,
-                horizontalArrangement = Arrangement.SpaceAround,
-            ) {
-                characters.forEach { character ->
-                    CharacterCard(
-                        character,
-                        onClick = { navController?.navigate("Character Details/${character.id}") }
-                    )
+        if (isCharacterLoading) {
+            item { LoadingIndicator() }
+        }
+        else {
+            item {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    maxItemsInEachRow = 3,
+                    horizontalArrangement = Arrangement.SpaceAround,
+                ) {
+                    characters.forEach { character ->
+                        CharacterCard(
+                            character,
+                            onClick = {
+                                navController?.navigate(
+                                    Screen.CharacterDetails.createRoute(character.id)
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }

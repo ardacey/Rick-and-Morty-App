@@ -37,6 +37,9 @@ class CharacterDetailsViewModel(
             }
         }
     }
+    fun clearError() {
+        _error.value = null
+    }
 }
 
 data class CharacterDetailsScreenState(

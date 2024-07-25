@@ -45,6 +45,9 @@ class CharacterEpisodeViewModel(
             }
         }
     }
+    fun clearError() {
+        _error.value = null
+    }
 }
 
 data class CharacterEpisodeScreenState(

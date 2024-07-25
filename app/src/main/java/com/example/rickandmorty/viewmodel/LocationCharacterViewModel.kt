@@ -45,6 +45,9 @@ class LocationCharacterViewModel(
             }
         }
     }
+    fun clearError() {
+        _error.value = null
+    }
 }
 
 data class LocationCharacterScreenState(

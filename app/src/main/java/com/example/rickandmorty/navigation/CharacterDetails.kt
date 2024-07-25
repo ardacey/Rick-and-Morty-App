@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.navigation.NavController
 import com.example.rickandmorty.components.EpisodeCard
+import com.example.rickandmorty.components.LoadingIndicator
+import com.example.rickandmorty.components.Screen
 import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
 import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -37,6 +41,22 @@ fun CharacterDetailsScreen(
     id : Int?, navController: NavController?,
     characterViewModel: CharacterDetailsViewModel = koinViewModel(),
     episodeViewModel: CharacterEpisodeViewModel = koinViewModel()) {
+
+    val isEpisodeLoading by episodeViewModel.isLoading.collectAsState()
+    val characterError by characterViewModel.error.collectAsState()
+    val episodeError by episodeViewModel.error.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(characterError, episodeError) {
+        if (characterError != null || episodeError != null) {
+            val error = characterError ?: episodeError
+            error?.let {
+                snackbarHostState.showSnackbar(message = it.toString())
+                characterViewModel.clearError()
+                episodeViewModel.clearError()
+            }
+        }
+    }
 
     LaunchedEffect(id) {
         id?.let { characterViewModel.getCharacter(it) }
@@ -149,10 +169,16 @@ fun CharacterDetailsScreen(
                 )
             }
         }
-        items(episodes.size) { index ->
-            EpisodeCard(
-                episodes[index]
-            ) { navController?.navigate("Episode Details/${episodes[index].id}") }
+        if (isEpisodeLoading) {
+            item { LoadingIndicator() }
+        } else {
+            items(episodes.size) { index ->
+                EpisodeCard(
+                    episodes[index]
+                ) {
+                    navController?.navigate(Screen.EpisodeDetails.createRoute(episodes[index].id))
+                }
+            }
         }
     }
 }

@@ -37,6 +37,9 @@ class EpisodeDetailsViewModel(
             }
         }
     }
+    fun clearError() {
+        _error.value = null
+    }
 }
 
 data class EpisodeDetailsScreenState(

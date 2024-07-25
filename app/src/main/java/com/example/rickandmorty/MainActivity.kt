@@ -1,12 +1,18 @@
 package com.example.rickandmorty
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.rickandmorty.di.appModule
@@ -16,6 +22,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -24,12 +31,21 @@ class MainActivity : ComponentActivity() {
             modules(appModule)
         }
         setContent {
-            RickAndMortyTheme {
+            var isDarkMode by rememberSaveable { mutableStateOf(false) }
+
+            RickAndMortyTheme(
+                darkTheme = isDarkMode
+            ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
-                ) { Navigation() }
+                ) {
+                    Navigation(
+                        isDarkMode = isDarkMode,
+                        onDarkModeToggle = { isDarkMode = it }
+                    )
+                }
             }
         }
     }
