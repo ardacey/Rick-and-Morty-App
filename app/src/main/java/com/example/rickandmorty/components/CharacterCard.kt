@@ -1,4 +1,4 @@
-package com.example.rickandmorty.navigation
+package com.example.rickandmorty.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

@@ -14,9 +14,5 @@ data class Resource<out T>(val data: T?, val error: Exception?) {
         fun <T> error(error: Exception): Resource<T> {
             return Resource(null, error)
         }
-
-        fun <T> loading(data: T?): Resource<T> {
-            return Resource(null, null)
-        }
     }
 }

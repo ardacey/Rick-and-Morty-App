@@ -1,5 +1,7 @@
 package com.example.rickandmorty.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
@@ -20,46 +22,61 @@ import com.example.rickandmorty.navigation.EpisodesScreen
 import com.example.rickandmorty.navigation.LocationDetailsScreen
 import com.example.rickandmorty.navigation.LocationsScreen
 
+sealed class Screen(val route: String) {
+    object Characters : Screen("characters")
+    object Locations : Screen("locations")
+    object Episodes : Screen("episodes")
+    object CharacterDetails : Screen("character_details/{characterId}") {
+        fun createRoute(characterId: Int) = "character_details/$characterId"
+    }
+    object LocationDetails : Screen("location_details/{locationId}") {
+        fun createRoute(locationId: Int) = "location_details/$locationId"
+    }
+    object EpisodeDetails : Screen("episode_details/{episodeId}") {
+        fun createRoute(episodeId: Int) = "episode_details/$episodeId"
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(){
     val navController = rememberNavController()
     val items = listOf(
-        BottomNavItem("Characters",Icons.Filled.Face, "characters"),
-        BottomNavItem("Locations", Icons.Filled.LocationOn, "locations"),
-        BottomNavItem("Episodes", Icons.Filled.Menu, "episodes")
+        BottomNavItem("Characters", Icons.Filled.Face, Screen.Characters.route),
+        BottomNavItem("Locations", Icons.Filled.LocationOn, Screen.Locations.route),
+        BottomNavItem("Episodes", Icons.Filled.Menu, Screen.Episodes.route)
     )
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController, items = items) }
-    ) {
-        innerPadding ->
+    ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "characters",
+            startDestination = Screen.Characters.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("characters") { CharactersScreen(navController) }
-            composable("locations") { LocationsScreen(navController) }
-            composable("episodes") { EpisodesScreen(navController) }
-
+            composable(Screen.Characters.route) { CharactersScreen(navController) }
+            composable(Screen.Locations.route) { LocationsScreen(navController) }
+            composable(Screen.Episodes.route) { EpisodesScreen(navController) }
             composable(
-                "Character Details/{characterId}",
+                Screen.CharacterDetails.route,
                 arguments = listOf(navArgument("characterId") { type = NavType.IntType })
-            ) {
-                id -> CharacterDetailsScreen(id.arguments?.getInt("characterId"), navController)
+            ) { backStackEntry ->
+                val characterId = backStackEntry.arguments?.getInt("characterId")
+                CharacterDetailsScreen(characterId, navController)
             }
-
             composable(
-                "Location Details/{locationId}",
+                Screen.LocationDetails.route,
                 arguments = listOf(navArgument("locationId") { type = NavType.IntType })
-            ) { id ->
-                LocationDetailsScreen(id.arguments?.getInt("locationId"), navController)
+            ) { backStackEntry ->
+                val locationId = backStackEntry.arguments?.getInt("locationId")
+                LocationDetailsScreen(locationId, navController)
             }
-
             composable(
-                "Episode Details/{episodeId}",
+                Screen.EpisodeDetails.route,
                 arguments = listOf(navArgument("episodeId") { type = NavType.IntType })
-            ) { id ->
-                EpisodeDetailsScreen(id.arguments?.getInt("episodeId"), navController)
+            ) { backStackEntry ->
+                val episodeId = backStackEntry.arguments?.getInt("episodeId")
+                EpisodeDetailsScreen(episodeId, navController)
             }
         }
     }

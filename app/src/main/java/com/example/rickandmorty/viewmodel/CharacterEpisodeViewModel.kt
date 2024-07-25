@@ -1,39 +1,48 @@
 package com.example.rickandmorty.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Episode
 import com.example.rickandmorty.repository.EpisodeDownload
 import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CharacterEpisodeViewModel(
     private val repository: EpisodeDownload
 ) : ViewModel() {
 
-    var state by mutableStateOf(CharacterEpisodeScreenState())
-    val error = MutableLiveData<Resource<Exception>>()
-    val isLoading = MutableLiveData<Resource<Boolean>>()
+    private val _state = MutableStateFlow(CharacterEpisodeScreenState())
+    val state: StateFlow<CharacterEpisodeScreenState> = _state.asStateFlow()
+
+    private val _error = MutableStateFlow<Resource<Exception>?>(null)
+    val error: StateFlow<Resource<Exception>?> = _error.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     fun getEpisodes(episodeURLs: List<String>) {
-        isLoading.value = Resource.loading(true)
+        _isLoading.value = true
         viewModelScope.launch {
-            val episodeIDs = episodeURLs.map { it.substringAfterLast("/").toInt() }
-            val deferredEpisodes = episodeIDs.map { id ->
-                async {
-                    repository.getEpisode(id)
+            try {
+                val episodeIDs = episodeURLs.map { it.substringAfterLast("/").toInt() }
+                val deferredEpisodes = episodeIDs.map { id ->
+                    async {
+                        repository.getEpisode(id)
+                    }
                 }
-            }
 
-            isLoading.value = Resource.loading(false)
-            state = state.copy(
-                episodes = deferredEpisodes.map { it.await().data!! }
-            )
+                val episodes = deferredEpisodes.map { it.await().data!! }
+                _state.update { it.copy(episodes = episodes) }
+            } catch (e: Exception) {
+                _error.value = Resource.error(e)
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 }

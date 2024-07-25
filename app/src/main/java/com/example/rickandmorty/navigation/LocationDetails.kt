@@ -11,26 +11,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.rickandmorty.components.CharacterCard
 import com.example.rickandmorty.viewmodel.LocationCharacterViewModel
 import com.example.rickandmorty.viewmodel.LocationDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun LocationDetailsScreen(id : Int?, navController: NavController?) {
-    val locationDetailsViewModel = koinViewModel<LocationDetailsViewModel>()
-    locationDetailsViewModel.getLocation(id!!)
-    val location = locationDetailsViewModel.state.location
+fun LocationDetailsScreen(
+    id : Int?, navController: NavController?,
+    locationViewModel: LocationDetailsViewModel = koinViewModel(),
+    characterViewModel: LocationCharacterViewModel = koinViewModel()) {
 
-    val locationCharacterViewModel = koinViewModel<LocationCharacterViewModel>()
-    locationCharacterViewModel.getCharacters(location.residents)
-    val characters = locationCharacterViewModel.state.characters
+    LaunchedEffect(id) {
+        id?.let { locationViewModel.getLocation(it) }
+    }
+
+    val locationState by locationViewModel.state.collectAsState()
+    val location = locationState.location
+
+    LaunchedEffect(location.residents) {
+        characterViewModel.getCharacters(location.residents)
+    }
+
+    val charactersState by characterViewModel.state.collectAsState()
+    val characters = charactersState.characters
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

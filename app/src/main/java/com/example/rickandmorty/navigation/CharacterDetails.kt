@@ -14,6 +14,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,19 +27,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.navigation.NavController
+import com.example.rickandmorty.components.EpisodeCard
 import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
 import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CharacterDetailsScreen(id : Int?, navController: NavController?) {
-    val characterDetailsViewModel = koinViewModel<CharacterDetailsViewModel>()
-    characterDetailsViewModel.getCharacter(id!!)
-    val character = characterDetailsViewModel.state.character
+fun CharacterDetailsScreen(
+    id : Int?, navController: NavController?,
+    characterViewModel: CharacterDetailsViewModel = koinViewModel(),
+    episodeViewModel: CharacterEpisodeViewModel = koinViewModel()) {
 
-    val characterEpisodeViewModel = koinViewModel<CharacterEpisodeViewModel>()
-    characterEpisodeViewModel.getEpisodes(character.episode)
-    val episodes = characterEpisodeViewModel.state.episodes
+    LaunchedEffect(id) {
+        id?.let { characterViewModel.getCharacter(it) }
+    }
+
+    val characterState by characterViewModel.state.collectAsState()
+    val character = characterState.character
+
+    LaunchedEffect(character.episode) {
+        episodeViewModel.getEpisodes(character.episode)
+    }
+
+    val episodesState by episodeViewModel.state.collectAsState()
+    val episodes = episodesState.episodes
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

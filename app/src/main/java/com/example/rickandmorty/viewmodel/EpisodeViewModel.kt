@@ -1,9 +1,7 @@
 package com.example.rickandmorty.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Episode
@@ -11,49 +9,88 @@ import com.example.rickandmorty.repository.EpisodeDownload
 import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class EpisodeViewModel(
     private val repository: EpisodeDownload
-) : ViewModel()  {
+) : ViewModel() {
 
-    var state by mutableStateOf(EpisodeScreenState())
-    val error = MutableLiveData<Resource<Exception>>()
-    val isLoading = MutableLiveData<Resource<Boolean>>()
+    private val _state = MutableStateFlow(EpisodeScreenState())
+    val state: StateFlow<EpisodeScreenState> = _state.asStateFlow()
+
+    private val _error = MutableStateFlow<Resource<Exception>?>(null)
+    val error: StateFlow<Resource<Exception>?> = _error.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init { getEpisode() }
 
     fun updateSearchQuery(query: String) {
-        state = state.copy(searchQuery = query)
+        _state.update { it.copy(searchQuery = query) }
+    }
+
+    fun updateStartDate(startDate: LocalDate) {
+        _state.update { it.copy(startDate = startDate) }
+    }
+
+    fun updateEndDate(endDate: LocalDate) {
+        _state.update { it.copy(endDate = endDate) }
     }
 
     private fun getEpisode() {
-        isLoading.value = Resource.loading(true)
+        _isLoading.value = true
         viewModelScope.launch {
-            val firstPageResponse = repository.getEpisodeList(1)
-            isLoading.value = Resource.loading(false)
-            val totalPages = firstPageResponse.data?.info?.pages ?: 1
+            try {
+                val firstPageResponse = repository.getEpisodeList(1)
+                val totalPages = firstPageResponse.data?.info?.pages ?: 1
 
-            val deferredList = (1..totalPages).map { currentPage ->
-                async {
-                    val response = repository.getEpisodeList(currentPage)
-                    response.data?.results.orEmpty()
+                val deferredList = (1..totalPages).map { currentPage ->
+                    async {
+                        repository.getEpisodeList(currentPage).data?.results.orEmpty()
+                    }
                 }
-            }
 
-            isLoading.value = Resource.loading(true)
-            val episodeList = deferredList.awaitAll().flatten()
-            state = state.copy(episodes = episodeList)
+                val episodeList = deferredList.awaitAll().flatten()
+                _state.update { it.copy(episodes = episodeList) }
+            } catch (e: Exception) {
+                _error.value = Resource.error(e)
+            } finally {
+                _isLoading.value = false
+            }
         }
+    }
+    fun clearError() {
+        _error.value = null
     }
 }
 
 data class EpisodeScreenState(
     val episodes: List<Episode> = emptyList(),
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null
 ) {
     val filteredEpisodes: List<Episode>
+        @RequiresApi(Build.VERSION_CODES.O)
         get() = episodes.filter { episode ->
-            episode.name.contains(searchQuery, ignoreCase = true)
+            val matchesQuery = episode.name.contains(searchQuery, ignoreCase = true)
+            val airDate = toLocalDate(episode.airDate)
+            val withinDateRange = (startDate == null || airDate >= startDate) &&
+                    (endDate == null || airDate <= endDate)
+
+            matchesQuery && withinDateRange
         }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun toLocalDate(dateString: String): LocalDate {
+        val formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
+        return LocalDate.parse(dateString, formatter)
+    }
 }

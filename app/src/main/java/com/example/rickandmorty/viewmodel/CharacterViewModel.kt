@@ -1,9 +1,5 @@
 package com.example.rickandmorty.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Character
@@ -11,53 +7,103 @@ import com.example.rickandmorty.repository.CharacterDownload
 import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CharacterViewModel(
     private val repository: CharacterDownload
 ) : ViewModel() {
 
-    var state by mutableStateOf(CharacterScreenState())
-    val error = MutableLiveData<Resource<Exception>>()
-    val isLoading = MutableLiveData<Resource<Boolean>>()
+    private val _state = MutableStateFlow(CharacterScreenState())
+    val state: StateFlow<CharacterScreenState> = _state.asStateFlow()
+
+    private val _error = MutableStateFlow<Resource<Exception>?>(null)
+    val error: StateFlow<Resource<Exception>?> = _error.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _speciesSuggestions = MutableStateFlow<List<String>>(emptyList())
+    val speciesSuggestions: StateFlow<List<String>> = _speciesSuggestions.asStateFlow()
+
+    private val _typeSuggestions = MutableStateFlow<List<String>>(emptyList())
+    val typeSuggestions: StateFlow<List<String>> = _typeSuggestions.asStateFlow()
 
     init { getCharacter() }
 
     fun updateSearchQuery(query: String) {
-        state = state.copy(searchQuery = query)
+        _state.update { it.copy(searchQuery = query) }
     }
 
     fun updateStatusFilter(filter: String) {
-        state = state.copy(statusFilter = filter)
+        _state.update { it.copy(statusFilter = filter) }
     }
 
     fun updateGenderFilter(filter: String) {
-        state = state.copy(genderFilter = filter)
+        _state.update { it.copy(genderFilter = filter) }
+    }
+
+    fun updateSpeciesQuery(query: String) {
+        _state.update { it.copy(speciesQuery = query) }
+        updateSpeciesSuggestions(query)
+    }
+
+    fun updateTypeQuery(query: String) {
+        _state.update { it.copy(typeQuery = query) }
+        updateTypeSuggestions(query)
+    }
+
+    fun updateSpeciesSuggestions(query: String) {
+        val filteredCharacters = _state.value.characters.filter {
+            it.species.contains(query, ignoreCase = true)
+        }
+        val newSuggestions = filteredCharacters.map { it.species }.distinct()
+        _speciesSuggestions.value = newSuggestions
+    }
+
+    fun updateTypeSuggestions(query: String) {
+        val filteredCharacters = _state.value.characters.filter {
+            it.type.contains(query, ignoreCase = true)
+        }
+        val newSuggestions = filteredCharacters.map { it.type }.distinct()
+        _typeSuggestions.value = newSuggestions
     }
 
     private fun getCharacter() {
-        isLoading.value = Resource.loading(true)
+        _isLoading.value = true
         viewModelScope.launch {
-            val firstPageResponse = repository.getCharacterList(1)
-            val totalPages = firstPageResponse.data?.info?.pages ?: 1
+            try {
+                val firstPageResponse = repository.getCharacterList(1)
+                val totalPages = firstPageResponse.data?.info?.pages ?: 1
 
-            val deferredList = (1..totalPages).map { currentPage ->
-                async {
-                    val response = repository.getCharacterList(currentPage)
-                    response.data?.results.orEmpty()
+                val deferredList = (1..totalPages).map { currentPage ->
+                    async {
+                        repository.getCharacterList(currentPage).data?.results.orEmpty()
+                    }
                 }
-            }
 
-            isLoading.value = Resource.loading(false)
-            val characterList = deferredList.awaitAll().flatten()
-            state = state.copy(characters = characterList)
+                val characterList = deferredList.awaitAll().flatten()
+                _state.update { it.copy(characters = characterList) }
+            } catch (e: Exception) {
+                _error.value = Resource.error(e)
+            } finally {
+                _isLoading.value = false
+            }
         }
+    }
+    fun clearError() {
+        _error.value = null
     }
 }
 
 data class CharacterScreenState(
     val characters: List<Character> = emptyList(),
     val searchQuery: String = "",
+    val speciesQuery: String = "",
+    val typeQuery: String = "",
     val statusFilter: String = "",
     val genderFilter: String = "",
 ) {
@@ -65,6 +111,8 @@ data class CharacterScreenState(
         get() = characters.filter { character ->
             character.name.contains(searchQuery, ignoreCase = true) &&
             (statusFilter.isEmpty() || character.status.equals(statusFilter, ignoreCase = true)) &&
-            (genderFilter.isEmpty() || character.gender.equals(genderFilter, ignoreCase = true))
+            (genderFilter.isEmpty() || character.gender.equals(genderFilter, ignoreCase = true)) &&
+            (speciesQuery.isEmpty() || character.species.equals(speciesQuery, ignoreCase = true)) &&
+            (typeQuery.isEmpty() || character.type.equals(typeQuery, ignoreCase = true))
         }
 }

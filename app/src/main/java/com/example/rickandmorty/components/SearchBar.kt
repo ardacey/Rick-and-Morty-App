@@ -22,7 +22,7 @@ fun SearchBar(
     searchQuery: String,
     onValueChange: (String) -> Unit,
     placeholderText: String,
-    showOptionsSheet: () -> Unit
+    showOptionsSheet: (() -> Unit)? = null,
 ) {
     Card(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
@@ -43,8 +43,10 @@ fun SearchBar(
             ),
             leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) },
             trailingIcon = {
-                IconButton(onClick = { showOptionsSheet() }) {
-                    Icon(imageVector = Icons.Filled.Settings, contentDescription = null)
+                if (showOptionsSheet != null) {
+                    IconButton(onClick = { showOptionsSheet() }) {
+                        Icon(imageVector = Icons.Filled.Settings, contentDescription = null)
+                    }
                 }
             }
         )
