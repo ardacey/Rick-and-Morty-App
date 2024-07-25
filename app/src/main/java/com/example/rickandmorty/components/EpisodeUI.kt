@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rickandmorty.model.Episode
@@ -31,7 +32,9 @@ fun EpisodeUI(episode: Episode, onClick: () -> Unit = { }) {
         ) {
             Text(
                 text = episode.episode + ": " + episode.name,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "Air Date: " + episode.airDate,

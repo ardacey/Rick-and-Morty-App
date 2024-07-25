@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,7 +35,9 @@ fun BottomNavButton(
             Text(
                 text = item.title,
                 fontSize = 12.sp,
-                color = if (isSelected) Color.Black else Color.Gray
+                modifier = Modifier.graphicsLayer {
+                    alpha = if (isSelected) 1f else 0.4f
+                }
             )
         }
     }

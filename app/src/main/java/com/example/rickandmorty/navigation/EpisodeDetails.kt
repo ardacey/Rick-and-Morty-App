@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.rickandmorty.components.CharacterCard
+import com.example.rickandmorty.components.Screen
 import com.example.rickandmorty.viewmodel.EpisodeCharacterViewModel
 import com.example.rickandmorty.viewmodel.EpisodeDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -94,7 +95,7 @@ fun EpisodeDetailsScreen(
                 characters.forEach { character ->
                     CharacterCard(
                         character,
-                        onClick = { navController?.navigate("Character Details/${character.id}") }
+                        onClick = { navController?.navigate(Screen.CharacterDetails.createRoute(character.id)) }
                     )
                 }
             }

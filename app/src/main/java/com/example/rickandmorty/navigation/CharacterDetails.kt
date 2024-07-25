@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.navigation.NavController
 import com.example.rickandmorty.components.EpisodeCard
+import com.example.rickandmorty.components.Screen
 import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
 import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -150,9 +151,9 @@ fun CharacterDetailsScreen(
             }
         }
         items(episodes.size) { index ->
-            EpisodeCard(
-                episodes[index]
-            ) { navController?.navigate("Episode Details/${episodes[index].id}") }
+            EpisodeCard(episodes[index]
+            ) { navController?.navigate(Screen.EpisodeDetails.createRoute(episodes[index].id))
+            }
         }
     }
 }
