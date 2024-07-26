@@ -15,11 +15,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.example.rickandmorty.components.EpisodeBottomSheet
-import com.example.rickandmorty.components.EpisodeUI
+import com.example.rickandmorty.components.main_screen_ui.bottom_sheet_ui.EpisodeBottomSheet
+import com.example.rickandmorty.components.main_screen_ui.EpisodeUI
 import com.example.rickandmorty.components.LoadingIndicator
-import com.example.rickandmorty.components.Screen
-import com.example.rickandmorty.components.SearchBar
+import com.example.rickandmorty.components.navigation_ui.Screen
+import com.example.rickandmorty.components.main_screen_ui.SearchBar
 import com.example.rickandmorty.viewmodel.EpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
 

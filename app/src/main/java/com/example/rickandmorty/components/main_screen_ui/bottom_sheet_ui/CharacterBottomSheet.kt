@@ -1,10 +1,11 @@
-package com.example.rickandmorty.components
+package com.example.rickandmorty.components.main_screen_ui.bottom_sheet_ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +25,10 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         Column {
-            Text(text = "Species:", modifier = Modifier.padding(horizontal = 20.dp))
+            Text(
+                text = "Species:",
+                modifier = Modifier.padding(horizontal = 20.dp),
+                style = MaterialTheme.typography.displayMedium)
             SearchFilter(
                 searchQuery = state.speciesQuery,
                 onValueChange = { viewModel.updateSpeciesQuery(it) },
@@ -32,7 +36,10 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                 onSuggestionSelected = { viewModel.updateSpeciesSuggestions(it) }
             )
 
-            Text(text = "Type:", modifier = Modifier.padding(horizontal = 20.dp))
+            Text(
+                text = "Type:",
+                modifier = Modifier.padding(horizontal = 20.dp),
+                style = MaterialTheme.typography.displayMedium)
             SearchFilter(
                 searchQuery = state.typeQuery,
                 onValueChange = { viewModel.updateTypeQuery(it) },
@@ -41,7 +48,10 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Status:", modifier = Modifier.padding(horizontal = 20.dp))
+            Text(
+                text = "Status:",
+                modifier = Modifier.padding(horizontal = 20.dp),
+                style = MaterialTheme.typography.displayMedium)
             FilterCheckbox(
                 label = "Alive",
                 isSelected = state.statusFilter == "Alive",
@@ -66,7 +76,10 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Gender:", modifier = Modifier.padding(horizontal = 20.dp))
+            Text(
+                text = "Gender:",
+                modifier = Modifier.padding(horizontal = 20.dp),
+                style = MaterialTheme.typography.displayMedium)
             FilterCheckbox(
                 label = "Male",
                 isSelected = state.genderFilter == "Male",

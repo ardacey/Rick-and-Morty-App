@@ -1,4 +1,4 @@
-package com.example.rickandmorty.components
+package com.example.rickandmorty.components.main_screen_ui.bottom_sheet_ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

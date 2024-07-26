@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.rickandmorty.di.appModule
-import com.example.rickandmorty.components.Navigation
+import com.example.rickandmorty.components.navigation_ui.Navigation
 import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.ui.theme.RickAndMortyTheme
 import kotlinx.coroutines.launch

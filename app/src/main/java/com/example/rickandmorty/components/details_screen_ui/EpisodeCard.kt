@@ -1,4 +1,4 @@
-package com.example.rickandmorty.components
+package com.example.rickandmorty.components.details_screen_ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,14 +12,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.rickandmorty.model.Episode
 
 @Composable
@@ -43,12 +42,11 @@ fun EpisodeCard(episode: Episode, onClick: () -> Unit = { }) {
             Column {
                 Text(
                     text = episode.episode,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
                     text = episode.name,
-                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.displayMedium,
                     maxLines = 1,
                     modifier = Modifier.width(200.dp),
                     overflow = TextOverflow.Ellipsis

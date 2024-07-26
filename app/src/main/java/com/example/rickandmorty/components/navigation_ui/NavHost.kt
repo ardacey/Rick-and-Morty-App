@@ -1,4 +1,4 @@
-package com.example.rickandmorty.components
+package com.example.rickandmorty.components.navigation_ui
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.rickandmorty.components.main_screen_ui.TopBar
 import com.example.rickandmorty.navigation.CharacterDetailsScreen
 import com.example.rickandmorty.navigation.CharactersScreen
 import com.example.rickandmorty.navigation.EpisodeDetailsScreen

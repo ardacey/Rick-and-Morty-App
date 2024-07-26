@@ -1,4 +1,4 @@
-package com.example.rickandmorty.components
+package com.example.rickandmorty.components.main_screen_ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -29,7 +30,9 @@ fun SearchBar(
         TextField(
             value = searchQuery,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholderText) },
+            placeholder = { Text(
+                text = placeholderText,
+                style = MaterialTheme.typography.displayMedium) },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) },
             trailingIcon = {

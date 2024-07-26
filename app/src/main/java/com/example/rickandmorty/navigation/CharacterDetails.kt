@@ -1,17 +1,11 @@
 package com.example.rickandmorty.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,17 +15,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import androidx.navigation.NavController
-import com.example.rickandmorty.components.EpisodeCard
+import com.example.rickandmorty.components.details_screen_ui.EpisodeCard
 import com.example.rickandmorty.components.LoadingIndicator
-import com.example.rickandmorty.components.Screen
+import com.example.rickandmorty.components.details_screen_ui.CharacterDetailsHeader
+import com.example.rickandmorty.components.navigation_ui.Screen
 import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
 import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -43,18 +32,18 @@ fun CharacterDetailsScreen(
     episodeViewModel: CharacterEpisodeViewModel = koinViewModel()) {
 
     val isEpisodeLoading by episodeViewModel.isLoading.collectAsState()
+    val characterState by characterViewModel.state.collectAsState()
+    val episodesState by episodeViewModel.state.collectAsState()
     val characterError by characterViewModel.error.collectAsState()
     val episodeError by episodeViewModel.error.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(characterError, episodeError) {
-        if (characterError != null || episodeError != null) {
-            val error = characterError ?: episodeError
-            error?.let {
-                snackbarHostState.showSnackbar(message = it.toString())
-                characterViewModel.clearError()
-                episodeViewModel.clearError()
-            }
+        val error = characterError ?: episodeError
+        error?.let {
+            snackbarHostState.showSnackbar(message = it.toString())
+            characterViewModel.clearError()
+            episodeViewModel.clearError()
         }
     }
 
@@ -62,14 +51,12 @@ fun CharacterDetailsScreen(
         id?.let { characterViewModel.getCharacter(it) }
     }
 
-    val characterState by characterViewModel.state.collectAsState()
     val character = characterState.character
 
     LaunchedEffect(character.episode) {
         episodeViewModel.getEpisodes(character.episode)
     }
 
-    val episodesState by episodeViewModel.state.collectAsState()
     val episodes = episodesState.episodes
 
     LazyColumn(
@@ -77,84 +64,7 @@ fun CharacterDetailsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color(0xFF03A9F4),
-                                Color(0xFFFFFF00)
-                            ),
-                        )
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                AsyncImage(
-                    model = character.image,
-                    contentDescription = character.name,
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape),
-                )
-            }
-            Text(
-                text = character.name,
-                modifier = Modifier.padding(16.dp),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = character.status,
-                fontSize = 16.sp,
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-
-            ) {
-                Column (horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = character.species,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "Species",
-                        fontSize = 12.sp,
-                    )
-                }
-
-                Column (horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = character.gender,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "Gender",
-                        fontSize = 12.sp,
-                    )
-                }
-            }
-            Column(
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)) {
-                Text(
-                    text = character.location.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = "Location",
-                    fontSize = 12.sp,
-                )
-            }
+            CharacterDetailsHeader(character)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -163,8 +73,7 @@ fun CharacterDetailsScreen(
             ) {
                 Text(
                     text = "Episodes (${character.episode.size})",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(12.dp),
                 )
             }
@@ -176,7 +85,8 @@ fun CharacterDetailsScreen(
                 EpisodeCard(
                     episodes[index]
                 ) {
-                    navController?.navigate(Screen.EpisodeDetails.createRoute(episodes[index].id))
+                    navController?.navigate(
+                        Screen.EpisodeDetails.createRoute(episodes[index].id))
                 }
             }
         }
