@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Location
 import com.example.rickandmorty.repository.LocationDownload
-import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +19,8 @@ class LocationViewModel(
     private val _state = MutableStateFlow(LocationScreenState())
     val state: StateFlow<LocationScreenState> = _state.asStateFlow()
 
-    private val _error = MutableStateFlow<Resource<Exception>?>(null)
-    val error: StateFlow<Resource<Exception>?> = _error.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -71,9 +70,17 @@ class LocationViewModel(
                 val firstPageResponse = repository.getLocationList(1)
                 val totalPages = firstPageResponse.data?.info?.pages ?: 1
 
+                if (firstPageResponse.error != null) {
+                    _error.value = firstPageResponse.error.message
+                    return@launch
+                }
+
                 val deferredList = (1..totalPages).map { currentPage ->
                     async {
                         val response = repository.getLocationList(currentPage)
+                        if (response.error != null) {
+                            throw Exception(response.error.message)
+                        }
                         response.data?.results.orEmpty()
                     }
                 }
@@ -81,14 +88,11 @@ class LocationViewModel(
                 val locationList = deferredList.awaitAll().flatten()
                 _state.update { it.copy(locations = locationList) }
             } catch (e: Exception) {
-                _error.value = Resource.error(e)
+                _error.value = e.message
             } finally {
                 _isLoading.value = false
             }
         }
-    }
-    fun clearError() {
-        _error.value = null
     }
 }
 

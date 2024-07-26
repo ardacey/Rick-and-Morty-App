@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Episode
 import com.example.rickandmorty.repository.EpisodeDownload
-import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,8 +18,8 @@ class CharacterEpisodeViewModel(
     private val _state = MutableStateFlow(CharacterEpisodeScreenState())
     val state: StateFlow<CharacterEpisodeScreenState> = _state.asStateFlow()
 
-    private val _error = MutableStateFlow<Resource<Exception>?>(null)
-    val error: StateFlow<Resource<Exception>?> = _error.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -32,21 +31,22 @@ class CharacterEpisodeViewModel(
                 val episodeIDs = episodeURLs.map { it.substringAfterLast("/").toInt() }
                 val deferredEpisodes = episodeIDs.map { id ->
                     async {
-                        repository.getEpisode(id)
+                        val response = repository.getEpisode(id)
+                        if (response.error != null) {
+                            throw Exception(response.error.message)
+                        }
+                        response.data!!
                     }
                 }
 
-                val episodes = deferredEpisodes.map { it.await().data!! }
+                val episodes = deferredEpisodes.map { it.await() }
                 _state.update { it.copy(episodes = episodes) }
             } catch (e: Exception) {
-                _error.value = Resource.error(e)
+                _error.value = e.message
             } finally {
                 _isLoading.value = false
             }
         }
-    }
-    fun clearError() {
-        _error.value = null
     }
 }
 

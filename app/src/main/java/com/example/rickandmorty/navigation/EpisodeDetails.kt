@@ -8,15 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.rickandmorty.components.details_screen_ui.CharacterCard
@@ -39,16 +38,6 @@ fun EpisodeDetailsScreen(
     val episodeError by episodeViewModel.error.collectAsState()
     val charactersState by characterViewModel.state.collectAsState()
     val characterError by characterViewModel.error.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(episodeError, characterError) {
-        val error = episodeError ?: characterError
-        error?.let {
-            snackbarHostState.showSnackbar(message = it.toString())
-            episodeViewModel.clearError()
-            characterViewModel.clearError()
-        }
-    }
 
     LaunchedEffect(id) {
         id?.let { episodeViewModel.getEpisode(it) }
@@ -67,14 +56,30 @@ fun EpisodeDetailsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            EpisodeDetailsHeader(episode)
+            if (episodeError != null) {
+                Text(
+                    text = episodeError!!,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
+                    style = MaterialTheme.typography.displayMedium,
+                    color = Color.Red
+                )
+            } else { EpisodeDetailsHeader(episode) }
             Text(
                 text = "Characters (${characters.size})",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.titleLarge,
             )
         }
-        if (isCharacterLoading) {
+        if (characterError != null) {
+            item {
+                Text(
+                    text = characterError!!,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
+                    style = MaterialTheme.typography.displayMedium,
+                    color = Color.Red
+                )
+            }
+        } else if (isCharacterLoading) {
             item { LoadingIndicator() }
         }
         else {

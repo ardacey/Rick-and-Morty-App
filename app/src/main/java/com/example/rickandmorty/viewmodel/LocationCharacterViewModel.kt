@@ -6,7 +6,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import com.example.rickandmorty.model.Character
 import com.example.rickandmorty.repository.CharacterDownload
-import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +18,8 @@ class LocationCharacterViewModel(
     private val _state = MutableStateFlow(LocationCharacterScreenState())
     val state: StateFlow<LocationCharacterScreenState> = _state.asStateFlow()
 
-    private val _error = MutableStateFlow<Resource<Exception>?>(null)
-    val error: StateFlow<Resource<Exception>?> = _error.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -32,21 +31,22 @@ class LocationCharacterViewModel(
                 val characterIDs = characterURLs.map { it.substringAfterLast("/").toInt() }
                 val deferredCharacters = characterIDs.map { id ->
                     async {
-                        repository.getCharacter(id)
+                        val response = repository.getCharacter(id)
+                        if (response.error != null) {
+                            throw Exception(response.error.message)
+                        }
+                        response.data!!
                     }
                 }
 
-                val characters = deferredCharacters.map { it.await().data!! }
+                val characters = deferredCharacters.map { it.await()}
                 _state.update { it.copy(characters = characters) }
             } catch (e: Exception) {
-                _error.value = Resource.error(e)
+                _error.value = e.message
             } finally {
                 _isLoading.value = false
             }
         }
-    }
-    fun clearError() {
-        _error.value = null
     }
 }
 

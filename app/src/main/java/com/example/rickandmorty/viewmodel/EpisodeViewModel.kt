@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Episode
 import com.example.rickandmorty.repository.EpisodeDownload
-import com.example.rickandmorty.util.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +23,8 @@ class EpisodeViewModel(
     private val _state = MutableStateFlow(EpisodeScreenState())
     val state: StateFlow<EpisodeScreenState> = _state.asStateFlow()
 
-    private val _error = MutableStateFlow<Resource<Exception>?>(null)
-    val error: StateFlow<Resource<Exception>?> = _error.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -51,23 +50,29 @@ class EpisodeViewModel(
                 val firstPageResponse = repository.getEpisodeList(1)
                 val totalPages = firstPageResponse.data?.info?.pages ?: 1
 
+                if (firstPageResponse.error != null) {
+                    _error.value = firstPageResponse.error.message
+                    return@launch
+                }
+
                 val deferredList = (1..totalPages).map { currentPage ->
                     async {
-                        repository.getEpisodeList(currentPage).data?.results.orEmpty()
+                        val response = repository.getEpisodeList(currentPage)
+                        if (response.error != null) {
+                            throw Exception(response.error.message)
+                        }
+                        response.data?.results.orEmpty()
                     }
                 }
 
                 val episodeList = deferredList.awaitAll().flatten()
                 _state.update { it.copy(episodes = episodeList) }
             } catch (e: Exception) {
-                _error.value = Resource.error(e)
+                _error.value = e.message
             } finally {
                 _isLoading.value = false
             }
         }
-    }
-    fun clearError() {
-        _error.value = null
     }
 }
 
