@@ -42,7 +42,9 @@ fun LocationsScreen(
             state.searchQuery,
             {viewModel.updateSearchQuery(it)},
             "Search Locations",
-            showOptionsSheet = { showBottomSheet.value = true })
+            showOptionsSheet = { showBottomSheet.value = true },
+            clearSearch = { viewModel.updateSearchQuery("") }
+        )
         if (error != null) {
             Text(
                 text = error!!,
@@ -59,15 +61,19 @@ fun LocationsScreen(
                 content = {
                     val filteredLocations = state.filteredLocations
                     items(filteredLocations.size) { index ->
+                        val location = filteredLocations[index]
+                        val isFavorite = state.favoriteLocationIds.contains(location.id.toString())
+
                         LocationUI(
-                            location = filteredLocations[index]
-                        ) {
-                            navController.navigate(
-                                Screen.LocationDetails.createRoute(
-                                    filteredLocations[index].id
-                                )
-                            )
-                        }
+                            location = location,
+                            isFavorite = isFavorite,
+                            onClick = {
+                                navController.navigate(Screen.LocationDetails.createRoute(location.id))
+                            },
+                            onFavoriteClick = {
+                                viewModel.toggleFavoriteLocation(location.id.toString())
+                            }
+                        )
                     }
                 }
             )

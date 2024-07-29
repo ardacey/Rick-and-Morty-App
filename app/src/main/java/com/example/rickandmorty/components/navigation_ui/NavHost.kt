@@ -25,23 +25,29 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.rickandmorty.components.main_screen_ui.TopBar
 import com.example.rickandmorty.navigation.CharacterDetailsScreen
+import com.example.rickandmorty.navigation.CharacterFavorites
 import com.example.rickandmorty.navigation.CharactersScreen
 import com.example.rickandmorty.navigation.EpisodeDetailsScreen
+import com.example.rickandmorty.navigation.EpisodeFavorites
 import com.example.rickandmorty.navigation.EpisodesScreen
 import com.example.rickandmorty.navigation.LocationDetailsScreen
+import com.example.rickandmorty.navigation.LocationFavorites
 import com.example.rickandmorty.navigation.LocationsScreen
 
 sealed class Screen(val route: String) {
-    object Characters : Screen("characters")
-    object Locations : Screen("locations")
-    object Episodes : Screen("episodes")
-    object CharacterDetails : Screen("character_details/{characterId}") {
+    data object Characters : Screen("characters")
+    data object Locations : Screen("locations")
+    data object Episodes : Screen("episodes")
+    data object CharacterFavorites : Screen("character_favorites")
+    data object LocationFavorites : Screen("location_favorites")
+    data object EpisodeFavorites : Screen("episode_favorites")
+    data object CharacterDetails : Screen("character_details/{characterId}") {
         fun createRoute(characterId: Int) = "character_details/$characterId"
     }
-    object LocationDetails : Screen("location_details/{locationId}") {
+    data object LocationDetails : Screen("location_details/{locationId}") {
         fun createRoute(locationId: Int) = "location_details/$locationId"
     }
-    object EpisodeDetails : Screen("episode_details/{episodeId}") {
+    data object EpisodeDetails : Screen("episode_details/{episodeId}") {
         fun createRoute(episodeId: Int) = "episode_details/$episodeId"
     }
 }
@@ -49,7 +55,10 @@ sealed class Screen(val route: String) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Navigation(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit){
+fun Navigation(
+    isDarkMode: Boolean,
+    onDarkModeToggle: (Boolean) -> Unit,
+){
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val items = listOf(
@@ -88,7 +97,11 @@ fun Navigation(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit){
             ) {
                 Column {
                     if (currentRoute == Screen.Characters.route) {
-                        TopBar(isDarkMode = isDarkMode, onDarkModeToggle = onDarkModeToggle)
+                        TopBar(
+                            isDarkMode = isDarkMode,
+                            onDarkModeToggle = onDarkModeToggle,
+                            onClick = { navController.navigate(Screen.CharacterFavorites.route) }
+                            )
                     }
                     CharactersScreen(navController)
                 }
@@ -122,7 +135,11 @@ fun Navigation(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit){
             ) {
                 Column {
                     if (currentRoute == Screen.Locations.route) {
-                        TopBar(isDarkMode = isDarkMode, onDarkModeToggle = onDarkModeToggle)
+                        TopBar(
+                            isDarkMode = isDarkMode,
+                            onDarkModeToggle = onDarkModeToggle,
+                            onClick = { navController.navigate(Screen.LocationFavorites.route) }
+                        )
                     }
                     LocationsScreen(navController)
                 }
@@ -150,10 +167,23 @@ fun Navigation(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit){
                 ) {
                 Column {
                     if (currentRoute == Screen.Episodes.route) {
-                        TopBar(isDarkMode = isDarkMode, onDarkModeToggle = onDarkModeToggle)
+                        TopBar(
+                            isDarkMode = isDarkMode,
+                            onDarkModeToggle = onDarkModeToggle,
+                            onClick = { navController.navigate(Screen.EpisodeFavorites.route) }
+                        )
                     }
                     EpisodesScreen(navController)
                 }
+            }
+            composable(Screen.CharacterFavorites.route) {
+                CharacterFavorites(navController)
+            }
+            composable(Screen.LocationFavorites.route) {
+                LocationFavorites(navController)
+            }
+            composable(Screen.EpisodeFavorites.route) {
+                EpisodeFavorites(navController)
             }
             composable(
                 Screen.CharacterDetails.route,

@@ -1,6 +1,7 @@
 package com.example.rickandmorty.components.main_screen_ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,8 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +28,11 @@ import coil.compose.AsyncImage
 import com.example.rickandmorty.model.Character
 
 @Composable
-fun CharacterUI(character: Character, onClick: () -> Unit = { }) {
+fun CharacterUI(
+    character: Character,
+    isFavorite: Boolean,
+    onClick: () -> Unit = { },
+    onFavoriteClick: () -> Unit = {}) {
     Card(
         Modifier
             .wrapContentSize()
@@ -46,13 +55,23 @@ fun CharacterUI(character: Character, onClick: () -> Unit = { }) {
                     .fillMaxHeight()
                     .padding(horizontal = 6.dp),
             ) {
-                Text(
-                    text = character.name,
-                    modifier = Modifier.padding(6.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                ){
+                    Text(
+                        text = character.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        modifier = Modifier.clickable { onFavoriteClick.invoke() }
+                    )
+                }
+
                 Text(
                     text = "Origin",
                     modifier = Modifier.padding(vertical = 2.dp, horizontal = 6.dp),

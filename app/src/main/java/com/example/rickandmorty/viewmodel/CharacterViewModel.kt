@@ -2,6 +2,7 @@ package com.example.rickandmorty.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.model.Character
 import com.example.rickandmorty.repository.CharacterDownload
 import kotlinx.coroutines.async
@@ -9,12 +10,17 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class CharacterViewModel(
     private val repository: CharacterDownload
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+
+    private val preferencesManager: PreferencesManager by inject()
 
     private val _state = MutableStateFlow(CharacterScreenState())
     val state: StateFlow<CharacterScreenState> = _state.asStateFlow()
@@ -31,7 +37,12 @@ class CharacterViewModel(
     private val _typeSuggestions = MutableStateFlow<List<String>>(emptyList())
     val typeSuggestions: StateFlow<List<String>> = _typeSuggestions.asStateFlow()
 
-    init { getCharacter() }
+    private var favoriteCharacters = emptySet<String>()
+
+    init {
+        getCharacters()
+        observeFavoriteCharacters()
+    }
 
     fun updateSearchQuery(query: String) {
         _state.update { it.copy(searchQuery = query) }
@@ -56,22 +67,41 @@ class CharacterViewModel(
     }
 
     fun updateSpeciesSuggestions(query: String) {
-        val filteredCharacters = _state.value.characters.filter {
-            it.species.contains(query, ignoreCase = true)
-        }
-        val newSuggestions = filteredCharacters.map { it.species }.distinct()
-        _speciesSuggestions.value = newSuggestions
+        _state.value.characters
+            .flatMap { it.species.split(",") }
+            .filter { it.contains(query, ignoreCase = true) }
+            .distinct()
+            .let { _speciesSuggestions.value = it }
     }
 
     fun updateTypeSuggestions(query: String) {
-        val filteredCharacters = _state.value.characters.filter {
-            it.type.contains(query, ignoreCase = true)
-        }
-        val newSuggestions = filteredCharacters.map { it.type }.distinct()
-        _typeSuggestions.value = newSuggestions
+        _state.value.characters
+            .flatMap { it.type.split(",") }
+            .filter { it.contains(query, ignoreCase = true) }
+            .distinct()
+            .let { _typeSuggestions.value = it }
     }
 
-    private fun getCharacter() {
+    private fun observeFavoriteCharacters() {
+        viewModelScope.launch {
+            preferencesManager.favoriteCharactersFlow.collectLatest { favoriteCharacters ->
+                this@CharacterViewModel.favoriteCharacters = favoriteCharacters
+                _state.update { it.copy(favoriteCharacterIds = favoriteCharacters) }
+            }
+        }
+    }
+
+    fun toggleFavoriteCharacter(characterId: String) {
+        viewModelScope.launch {
+            if (favoriteCharacters.contains(characterId)) {
+                preferencesManager.removeFavoriteCharacter(characterId)
+            } else {
+                preferencesManager.addFavoriteCharacter(characterId)
+            }
+        }
+    }
+
+    private fun getCharacters() {
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -83,17 +113,12 @@ class CharacterViewModel(
                     return@launch
                 }
 
-                val deferredList = (1..totalPages).map { currentPage ->
+                val characterList = (1..totalPages).map { page ->
                     async {
-                        val response = repository.getCharacterList(currentPage)
-                        if (response.error != null) {
-                            throw Exception(response.error.message)
-                        }
-                        response.data?.results.orEmpty()
+                        repository.getCharacterList(page).data?.results.orEmpty()
                     }
-                }
+                }.awaitAll().flatten()
 
-                val characterList = deferredList.awaitAll().flatten()
                 _state.update { it.copy(characters = characterList) }
             } catch (e : Exception) {
                 _error.value = e.message
@@ -106,6 +131,7 @@ class CharacterViewModel(
 
 data class CharacterScreenState(
     val characters: List<Character> = emptyList(),
+    val favoriteCharacterIds: Set<String> = emptySet(),
     val searchQuery: String = "",
     val speciesQuery: String = "",
     val typeQuery: String = "",

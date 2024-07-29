@@ -58,7 +58,7 @@ fun EpisodeCard(episode: Episode, onClick: () -> Unit = { }) {
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
+                contentDescription = "Go to the Episode",
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .size(30.dp)

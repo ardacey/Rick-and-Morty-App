@@ -1,8 +1,11 @@
 package com.example.rickandmorty.components.main_screen_ui
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -12,6 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -21,7 +26,11 @@ fun SearchBar(
     onValueChange: (String) -> Unit,
     placeholderText: String,
     showOptionsSheet: (() -> Unit)? = null,
+    clearSearch: (() -> Unit)? = null
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,14 +43,22 @@ fun SearchBar(
                 text = placeholderText,
                 style = MaterialTheme.typography.displayMedium) },
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) },
+            maxLines = 1,
+            leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Search") },
             trailingIcon = {
-                if (showOptionsSheet != null) {
-                    IconButton(onClick = { showOptionsSheet() }) {
-                        Icon(imageVector = Icons.Filled.Settings, contentDescription = null)
+                if (isFocused) {
+                    IconButton(onClick = { clearSearch?.invoke() }) {
+                        Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear")
+                    }
+                } else {
+                    if (showOptionsSheet != null) {
+                        IconButton(onClick = { showOptionsSheet() }) {
+                            Icon(imageVector = Icons.Filled.Settings, contentDescription = "Options")
+                        }
                     }
                 }
-            }
+            },
+            interactionSource = interactionSource
         )
     }
 }

@@ -19,10 +19,16 @@ fun SearchFilter(
     onValueChange: (String) -> Unit,
     suggestions: List<String>,
     onSuggestionSelected: (String) -> Unit,
+    clearSearch: () -> Unit
 ) {
     val showSuggestions = searchQuery.isNotEmpty() && suggestions.isNotEmpty()
     Column {
-        SearchBar(searchQuery = searchQuery, onValueChange = onValueChange, placeholderText = "")
+        SearchBar(
+            searchQuery = searchQuery,
+            onValueChange = onValueChange,
+            placeholderText = "",
+            clearSearch = clearSearch
+        )
     }
     if (showSuggestions) {
         LazyColumn {

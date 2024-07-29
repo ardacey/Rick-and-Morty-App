@@ -1,5 +1,6 @@
 package com.example.rickandmorty.di
 
+import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.repository.CharacterDownload
 import com.example.rickandmorty.repository.CharacterDownloadImpl
 import com.example.rickandmorty.repository.EpisodeDownload
@@ -22,6 +23,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
+    single { PreferencesManager(get()) }
     single { RetrofitCharacterInstance.api }
     single { RetrofitEpisodeInstance.api }
     single { RetrofitLocationInstance.api }

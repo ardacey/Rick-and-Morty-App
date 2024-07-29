@@ -33,7 +33,8 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                 searchQuery = state.speciesQuery,
                 onValueChange = { viewModel.updateSpeciesQuery(it) },
                 suggestions = speciesSuggestions,
-                onSuggestionSelected = { viewModel.updateSpeciesSuggestions(it) }
+                onSuggestionSelected = { viewModel.updateSpeciesSuggestions(it) },
+                clearSearch = { viewModel.updateSpeciesQuery("") }
             )
 
             Text(
@@ -44,7 +45,8 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                 searchQuery = state.typeQuery,
                 onValueChange = { viewModel.updateTypeQuery(it) },
                 suggestions = typeSuggestions,
-                onSuggestionSelected = { viewModel.updateTypeSuggestions(it) }
+                onSuggestionSelected = { viewModel.updateTypeSuggestions(it) },
+                clearSearch = { viewModel.updateTypeQuery("") }
             )
             Spacer(modifier = Modifier.height(16.dp))
 

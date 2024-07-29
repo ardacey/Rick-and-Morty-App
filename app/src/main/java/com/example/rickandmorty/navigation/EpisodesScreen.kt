@@ -45,7 +45,9 @@ fun EpisodesScreen(
             searchQuery = state.searchQuery,
             onValueChange = {viewModel.updateSearchQuery(it)},
             placeholderText = "Search Episodes",
-            showOptionsSheet = { showBottomSheet.value = true })
+            showOptionsSheet = { showBottomSheet.value = true },
+            clearSearch = { viewModel.updateSearchQuery("") }
+        )
         if (error != null) {
             Text(
                 text = error!!,
@@ -62,15 +64,19 @@ fun EpisodesScreen(
                 content = {
                     val filteredEpisodes = state.filteredEpisodes
                     items(filteredEpisodes.size) { index ->
+                        val episode = filteredEpisodes[index]
+                        val isFavorite = state.favoriteEpisodeIds.contains(episode.id.toString())
+
                         EpisodeUI(
-                            episode = filteredEpisodes[index]
-                        ) {
-                            navController.navigate(
-                                Screen.EpisodeDetails.createRoute(
-                                    filteredEpisodes[index].id
-                                )
-                            )
-                        }
+                            episode = episode,
+                            isFavorite = isFavorite,
+                            onClick = {
+                                navController.navigate(Screen.EpisodeDetails.createRoute(episode.id))
+                            },
+                            onFavoriteClick = {
+                                viewModel.toggleFavoriteEpisode(episode.id.toString())
+                            },
+                        )
                     }
                 }
             )

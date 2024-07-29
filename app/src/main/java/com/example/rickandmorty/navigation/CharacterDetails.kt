@@ -26,7 +26,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CharacterDetailsScreen(
-    id : Int?, navController: NavController?,
+    id : Int?,
+    navController: NavController?,
     characterViewModel: CharacterDetailsViewModel = koinViewModel(),
     episodeViewModel: CharacterEpisodeViewModel = koinViewModel()) {
 

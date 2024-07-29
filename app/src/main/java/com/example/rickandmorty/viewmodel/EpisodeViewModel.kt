@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.model.Episode
 import com.example.rickandmorty.repository.EpisodeDownload
 import kotlinx.coroutines.async
@@ -13,12 +14,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class EpisodeViewModel(
     private val repository: EpisodeDownload
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+
+    private val preferencesManager: PreferencesManager by inject()
 
     private val _state = MutableStateFlow(EpisodeScreenState())
     val state: StateFlow<EpisodeScreenState> = _state.asStateFlow()
@@ -29,7 +34,12 @@ class EpisodeViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    init { getEpisode() }
+    private var favoriteEpisodes = emptySet<String>()
+
+    init {
+        getEpisodes()
+        observeFavoriteEpisodes()
+    }
 
     fun updateSearchQuery(query: String) {
         _state.update { it.copy(searchQuery = query) }
@@ -43,7 +53,26 @@ class EpisodeViewModel(
         _state.update { it.copy(endDate = endDate) }
     }
 
-    private fun getEpisode() {
+    private fun observeFavoriteEpisodes() {
+        viewModelScope.launch {
+            preferencesManager.favoriteEpisodesFlow.collect { favoriteEpisodes ->
+                this@EpisodeViewModel.favoriteEpisodes = favoriteEpisodes
+                _state.update { it.copy(favoriteEpisodeIds = favoriteEpisodes) }
+            }
+        }
+    }
+
+    fun toggleFavoriteEpisode(episodeId: String) {
+        viewModelScope.launch {
+            if (favoriteEpisodes.contains(episodeId)) {
+                preferencesManager.removeFavoriteEpisode(episodeId)
+            } else {
+                preferencesManager.addFavoriteEpisode(episodeId)
+            }
+        }
+    }
+
+    private fun getEpisodes() {
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -55,17 +84,12 @@ class EpisodeViewModel(
                     return@launch
                 }
 
-                val deferredList = (1..totalPages).map { currentPage ->
+                val episodeList = (1..totalPages).map { currentPage ->
                     async {
-                        val response = repository.getEpisodeList(currentPage)
-                        if (response.error != null) {
-                            throw Exception(response.error.message)
-                        }
-                        response.data?.results.orEmpty()
+                        repository.getEpisodeList(currentPage).data?.results.orEmpty()
                     }
-                }
+                }.awaitAll().flatten()
 
-                val episodeList = deferredList.awaitAll().flatten()
                 _state.update { it.copy(episodes = episodeList) }
             } catch (e: Exception) {
                 _error.value = e.message
@@ -78,6 +102,7 @@ class EpisodeViewModel(
 
 data class EpisodeScreenState(
     val episodes: List<Episode> = emptyList(),
+    val favoriteEpisodeIds: Set<String> = emptySet(),
     val searchQuery: String = "",
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null

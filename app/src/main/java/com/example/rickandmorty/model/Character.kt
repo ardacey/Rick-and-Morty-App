@@ -12,5 +12,5 @@ data class Character(
     val image: String = "",
     val episode: ArrayList<String> = arrayListOf(),
     val url: String = "",
-    val created: String = "",
+    val created: String = ""
 )

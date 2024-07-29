@@ -41,7 +41,9 @@ fun CharactersScreen(
             state.searchQuery,
             {viewModel.updateSearchQuery(it)},
             "Search Characters",
-            showOptionsSheet = { showBottomSheet.value = true })
+            showOptionsSheet = { showBottomSheet.value = true },
+            clearSearch = { viewModel.updateSearchQuery("") }
+        )
         if (error != null) {
             Text(
                 text = error!!,
@@ -58,9 +60,19 @@ fun CharactersScreen(
                 content = {
                     val filteredCharacters = state.filteredCharacters
                     items(filteredCharacters.size) { index ->
+                        val character = filteredCharacters[index]
+                        val isFavorite = state.favoriteCharacterIds.contains(character.id.toString())
+
                         CharacterUI(
-                            character = filteredCharacters[index]
-                        ) { navController.navigate(Screen.CharacterDetails.createRoute(filteredCharacters[index].id)) }
+                            character = character,
+                            isFavorite = isFavorite,
+                            onClick = {
+                                navController.navigate(Screen.CharacterDetails.createRoute(character.id))
+                            },
+                            onFavoriteClick = {
+                                viewModel.toggleFavoriteCharacter(character.id.toString())
+                            }
+                        )
                     }
                 }
             )

@@ -27,7 +27,8 @@ fun LocationBottomSheet(onDismissRequest: () -> Unit, viewModel: LocationViewMod
                 searchQuery = state.typeQuery,
                 onValueChange = { viewModel.updateTypeQuery(it) },
                 suggestions = typeSuggestions,
-                onSuggestionSelected = { viewModel.updateTypeSuggestions(it) }
+                onSuggestionSelected = { viewModel.updateTypeSuggestions(it) },
+                clearSearch = { viewModel.updateTypeQuery("") }
             )
 
             Text(text = "Dimension:", modifier = Modifier.padding(horizontal = 20.dp))
@@ -35,7 +36,8 @@ fun LocationBottomSheet(onDismissRequest: () -> Unit, viewModel: LocationViewMod
                 searchQuery = state.dimensionQuery,
                 onValueChange = { viewModel.updateDimensionQuery(it) },
                 suggestions = dimensionSuggestions,
-                onSuggestionSelected = { viewModel.updateDimensionSuggestions(it) }
+                onSuggestionSelected = { viewModel.updateDimensionSuggestions(it) },
+                clearSearch = { viewModel.updateDimensionQuery("") }
             )
         }
     }

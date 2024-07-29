@@ -2,6 +2,7 @@ package com.example.rickandmorty.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.model.Location
 import com.example.rickandmorty.repository.LocationDownload
 import kotlinx.coroutines.async
@@ -11,10 +12,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class LocationViewModel(
     private val repository: LocationDownload
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+
+    private val preferencesManager: PreferencesManager by inject()
 
     private val _state = MutableStateFlow(LocationScreenState())
     val state: StateFlow<LocationScreenState> = _state.asStateFlow()
@@ -31,7 +36,12 @@ class LocationViewModel(
     private val _dimensionSuggestions = MutableStateFlow<List<String>>(emptyList())
     val dimensionSuggestions: StateFlow<List<String>> = _dimensionSuggestions.asStateFlow()
 
-    init { getLocation() }
+    private var favoriteLocations = emptySet<String>()
+
+    init {
+        getLocations()
+        observeFavoriteLocations()
+    }
 
     fun updateSearchQuery(query: String) {
         _state.update { it.copy(searchQuery = query) }
@@ -48,22 +58,41 @@ class LocationViewModel(
     }
 
     fun updateTypeSuggestions(query: String) {
-        val filteredLocations = _state.value.locations.filter {
-            it.type.contains(query, ignoreCase = true)
-        }
-        val newSuggestions = filteredLocations.map { it.type }.distinct()
-        _typeSuggestions.value = newSuggestions
+        _state.value.locations
+            .flatMap { it.type.split(",") }
+            .filter { it.contains(query, ignoreCase = true) }
+            .distinct()
+            .let { _typeSuggestions.value = it }
     }
 
     fun updateDimensionSuggestions(query: String) {
-        val filteredLocations = _state.value.locations.filter {
-            it.dimension.contains(query, ignoreCase = true)
-        }
-        val newSuggestions = filteredLocations.map { it.dimension }.distinct()
-        _dimensionSuggestions.value = newSuggestions
+        _state.value.locations
+            .flatMap { it.dimension.split(",") }
+            .filter { it.contains(query, ignoreCase = true) }
+            .distinct()
+            .let { _dimensionSuggestions.value = it }
     }
 
-    private fun getLocation() {
+    private fun observeFavoriteLocations() {
+        viewModelScope.launch {
+            preferencesManager.favoriteLocationsFlow.collect { favoriteLocations ->
+                this@LocationViewModel.favoriteLocations = favoriteLocations
+                _state.update { it.copy(favoriteLocationIds = favoriteLocations) }
+            }
+        }
+    }
+
+    fun toggleFavoriteLocation(locationId: String) {
+        viewModelScope.launch {
+            if (favoriteLocations.contains(locationId)) {
+                preferencesManager.removeFavoriteLocation(locationId)
+            } else {
+                preferencesManager.addFavoriteLocation(locationId)
+            }
+        }
+    }
+
+    private fun getLocations() {
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -75,17 +104,12 @@ class LocationViewModel(
                     return@launch
                 }
 
-                val deferredList = (1..totalPages).map { currentPage ->
+                val locationList = (1..totalPages).map { currentPage ->
                     async {
-                        val response = repository.getLocationList(currentPage)
-                        if (response.error != null) {
-                            throw Exception(response.error.message)
-                        }
-                        response.data?.results.orEmpty()
+                        repository.getLocationList(currentPage).data?.results.orEmpty()
                     }
-                }
+                }.awaitAll().flatten()
 
-                val locationList = deferredList.awaitAll().flatten()
                 _state.update { it.copy(locations = locationList) }
             } catch (e: Exception) {
                 _error.value = e.message
@@ -98,6 +122,7 @@ class LocationViewModel(
 
 data class LocationScreenState(
     val locations: List<Location> = emptyList(),
+    val favoriteLocationIds: Set<String> = emptySet(),
     val searchQuery: String = "",
     val typeQuery: String = "",
     val dimensionQuery: String = "",
