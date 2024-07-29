@@ -1,4 +1,4 @@
-package com.example.rickandmorty.util
+package com.example.rickandmorty.util.api
 
 import com.example.rickandmorty.service.LocationAPI
 import com.example.rickandmorty.util.Util.BASE_URL

@@ -13,7 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rickandmorty.viewmodel.CharacterViewModel
+import com.example.rickandmorty.viewmodel.character.CharacterViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,7 +28,9 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
             Text(
                 text = "Species:",
                 modifier = Modifier.padding(horizontal = 20.dp),
-                style = MaterialTheme.typography.displayMedium)
+                style = MaterialTheme.typography.displayMedium
+            )
+
             SearchFilter(
                 searchQuery = state.speciesQuery,
                 onValueChange = { viewModel.updateSpeciesQuery(it) },
@@ -40,7 +42,9 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
             Text(
                 text = "Type:",
                 modifier = Modifier.padding(horizontal = 20.dp),
-                style = MaterialTheme.typography.displayMedium)
+                style = MaterialTheme.typography.displayMedium
+            )
+
             SearchFilter(
                 searchQuery = state.typeQuery,
                 onValueChange = { viewModel.updateTypeQuery(it) },
@@ -48,12 +52,23 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                 onSuggestionSelected = { viewModel.updateTypeSuggestions(it) },
                 clearSearch = { viewModel.updateTypeQuery("") }
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            FilterCheckbox(
+                label = "Only Favorites",
+                isSelected = state.onlyFavorites,
+                onCheckedChange = viewModel::updateOnlyFavorites
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Status:",
                 modifier = Modifier.padding(horizontal = 20.dp),
-                style = MaterialTheme.typography.displayMedium)
+                style = MaterialTheme.typography.displayMedium
+            )
+
             FilterCheckbox(
                 label = "Alive",
                 isSelected = state.statusFilter == "Alive",
@@ -61,6 +76,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                     viewModel.updateStatusFilter(if (it) "Alive" else "")
                 }
             )
+
             FilterCheckbox(
                 label = "Dead",
                 isSelected = state.statusFilter == "Dead",
@@ -68,6 +84,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                     viewModel.updateStatusFilter(if (it) "Dead" else "")
                 }
             )
+
             FilterCheckbox(
                 label = "Unknown",
                 isSelected = state.statusFilter == "unknown",
@@ -81,7 +98,9 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
             Text(
                 text = "Gender:",
                 modifier = Modifier.padding(horizontal = 20.dp),
-                style = MaterialTheme.typography.displayMedium)
+                style = MaterialTheme.typography.displayMedium
+            )
+
             FilterCheckbox(
                 label = "Male",
                 isSelected = state.genderFilter == "Male",
@@ -89,6 +108,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                     viewModel.updateGenderFilter(if (it) "Male" else "")
                 }
             )
+
             FilterCheckbox(
                 label = "Female",
                 isSelected = state.genderFilter == "Female",
@@ -96,6 +116,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                     viewModel.updateGenderFilter(if (it) "Female" else "")
                 }
             )
+
             FilterCheckbox(
                 label = "Genderless",
                 isSelected = state.genderFilter == "Genderless",
@@ -103,6 +124,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                     viewModel.updateGenderFilter(if (it) "Genderless" else "")
                 }
             )
+
             FilterCheckbox(
                 label = "Unknown",
                 isSelected = state.genderFilter == "unknown",

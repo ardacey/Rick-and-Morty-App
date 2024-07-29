@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.character
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,13 +26,14 @@ class CharacterDetailsViewModel(
     fun getCharacter(id : Int) {
         _isLoading.value = true
         viewModelScope.launch {
-            val response = repository.getCharacter(id)
-            if (response.error != null) {
-                _error.value = response.error.message
-                return@launch
+            try {
+                val response = repository.getCharacter(id)
+                _state.update { it.copy(character = response) }
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
             }
-            _state.update { it.copy(character = response.data!!) }
-            _isLoading.value = false
         }
     }
 }

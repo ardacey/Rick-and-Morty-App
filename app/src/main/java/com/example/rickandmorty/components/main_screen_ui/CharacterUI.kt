@@ -13,12 +13,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -32,7 +36,31 @@ fun CharacterUI(
     character: Character,
     isFavorite: Boolean,
     onClick: () -> Unit = { },
-    onFavoriteClick: () -> Unit = {}) {
+    onFavoriteClick: () -> Unit = {}
+) {
+    val showDialog = remember { mutableStateOf(false) }
+
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            confirmButton = {
+                Button(onClick = {
+                    onFavoriteClick()
+                    showDialog.value = false }
+                ) {
+                    Text("Unfavorite")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog.value = false }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Unfavorite Character") },
+            text = { Text("Are you sure you want to unfavorite this character?") }
+        )
+    }
+
     Card(
         Modifier
             .wrapContentSize()
@@ -57,7 +85,9 @@ fun CharacterUI(
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
                 ){
                     Text(
                         text = character.name,
@@ -68,7 +98,13 @@ fun CharacterUI(
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Favorite",
-                        modifier = Modifier.clickable { onFavoriteClick.invoke() }
+                        modifier = Modifier.clickable {
+                            if (isFavorite) {
+                                showDialog.value = true
+                            } else {
+                                onFavoriteClick()
+                            }
+                        }
                     )
                 }
 

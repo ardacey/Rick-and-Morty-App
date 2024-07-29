@@ -1,4 +1,4 @@
-package com.example.rickandmorty.navigation
+package com.example.rickandmorty.navigation.location
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -20,33 +20,33 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.rickandmorty.components.details_screen_ui.CharacterCard
 import com.example.rickandmorty.components.LoadingIndicator
-import com.example.rickandmorty.components.details_screen_ui.EpisodeDetailsHeader
+import com.example.rickandmorty.components.details_screen_ui.LocationDetailsHeader
 import com.example.rickandmorty.components.navigation_ui.Screen
-import com.example.rickandmorty.viewmodel.EpisodeCharacterViewModel
-import com.example.rickandmorty.viewmodel.EpisodeDetailsViewModel
+import com.example.rickandmorty.viewmodel.location.LocationCharacterViewModel
+import com.example.rickandmorty.viewmodel.location.LocationDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun EpisodeDetailsScreen(
+fun LocationDetailsScreen(
     id : Int?, navController: NavController?,
-    episodeViewModel: EpisodeDetailsViewModel = koinViewModel(),
-    characterViewModel: EpisodeCharacterViewModel = koinViewModel()) {
+    locationViewModel: LocationDetailsViewModel = koinViewModel(),
+    characterViewModel: LocationCharacterViewModel = koinViewModel()) {
 
     val isCharacterLoading by characterViewModel.isLoading.collectAsState()
-    val episodeState by episodeViewModel.state.collectAsState()
-    val episodeError by episodeViewModel.error.collectAsState()
+    val locationState by locationViewModel.state.collectAsState()
+    val locationError by locationViewModel.error.collectAsState()
     val charactersState by characterViewModel.state.collectAsState()
     val characterError by characterViewModel.error.collectAsState()
 
     LaunchedEffect(id) {
-        id?.let { episodeViewModel.getEpisode(it) }
+        id?.let { locationViewModel.getLocation(it) }
     }
 
-    val episode = episodeState.episode
+    val location = locationState.location
 
-    LaunchedEffect(episode.characters) {
-        characterViewModel.getCharacters(episode.characters)
+    LaunchedEffect(location.residents) {
+        characterViewModel.getCharacters(location.residents)
     }
 
     val characters = charactersState.characters
@@ -56,16 +56,16 @@ fun EpisodeDetailsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            if (episodeError != null) {
+            if (locationError != null || characterError != null) {
                 Text(
-                    text = episodeError!!,
+                    text = locationError ?: characterError!!,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.Red
                 )
-            } else { EpisodeDetailsHeader(episode) }
+            } else { LocationDetailsHeader(location) }
             Text(
-                text = "Characters (${characters.size})",
+                text = "Residents (${characters.size})",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.titleLarge,
             )

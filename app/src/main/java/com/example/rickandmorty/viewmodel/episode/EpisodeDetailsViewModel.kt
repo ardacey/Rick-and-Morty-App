@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.episode
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,13 +26,14 @@ class EpisodeDetailsViewModel(
     fun getEpisode(id : Int) {
         _isLoading.value = true
         viewModelScope.launch {
-            val response = repository.getEpisode(id)
-            if (response.error != null) {
-                _error.value = response.error.message
-                return@launch
+            try {
+                val response = repository.getEpisode(id)
+                _state.update { it.copy(episode = response) }
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
             }
-            _state.update { it.copy(episode = response.data!!) }
-            _isLoading.value = false
         }
     }
 }

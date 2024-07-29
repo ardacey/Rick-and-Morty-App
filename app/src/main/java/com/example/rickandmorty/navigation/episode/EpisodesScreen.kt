@@ -1,4 +1,4 @@
-package com.example.rickandmorty.navigation
+package com.example.rickandmorty.navigation.episode
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -24,7 +24,7 @@ import com.example.rickandmorty.components.main_screen_ui.EpisodeUI
 import com.example.rickandmorty.components.LoadingIndicator
 import com.example.rickandmorty.components.navigation_ui.Screen
 import com.example.rickandmorty.components.main_screen_ui.SearchBar
-import com.example.rickandmorty.viewmodel.EpisodeViewModel
+import com.example.rickandmorty.viewmodel.episode.EpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -43,7 +43,7 @@ fun EpisodesScreen(
     ) {
         SearchBar(
             searchQuery = state.searchQuery,
-            onValueChange = {viewModel.updateSearchQuery(it)},
+            onValueChange = viewModel::updateSearchQuery,
             placeholderText = "Search Episodes",
             showOptionsSheet = { showBottomSheet.value = true },
             clearSearch = { viewModel.updateSearchQuery("") }

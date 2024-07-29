@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.episode
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class LocationCharacterViewModel(
+class EpisodeCharacterViewModel(
     private val repository: CharacterDownload
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(LocationCharacterScreenState())
-    val state: StateFlow<LocationCharacterScreenState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(EpisodeCharacterScreenState())
+    val state: StateFlow<EpisodeCharacterScreenState> = _state.asStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
@@ -31,15 +31,11 @@ class LocationCharacterViewModel(
                 val characterIDs = characterURLs.map { it.substringAfterLast("/").toInt() }
                 val deferredCharacters = characterIDs.map { id ->
                     async {
-                        val response = repository.getCharacter(id)
-                        if (response.error != null) {
-                            throw Exception(response.error.message)
-                        }
-                        response.data!!
+                        repository.getCharacter(id)
                     }
                 }
 
-                val characters = deferredCharacters.map { it.await()}
+                val characters = deferredCharacters.map { it.await() }
                 _state.update { it.copy(characters = characters) }
             } catch (e: Exception) {
                 _error.value = e.message
@@ -50,6 +46,6 @@ class LocationCharacterViewModel(
     }
 }
 
-data class LocationCharacterScreenState(
+data class EpisodeCharacterScreenState(
     val characters : List<Character> = emptyList(),
 )

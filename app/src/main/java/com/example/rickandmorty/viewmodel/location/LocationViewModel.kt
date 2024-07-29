@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -73,6 +73,10 @@ class LocationViewModel(
             .let { _dimensionSuggestions.value = it }
     }
 
+    fun updateOnlyFavorites(onlyFavorites: Boolean) {
+        _state.update { it.copy(onlyFavorites = onlyFavorites) }
+    }
+
     private fun observeFavoriteLocations() {
         viewModelScope.launch {
             preferencesManager.favoriteLocationsFlow.collect { favoriteLocations ->
@@ -97,16 +101,11 @@ class LocationViewModel(
         viewModelScope.launch {
             try {
                 val firstPageResponse = repository.getLocationList(1)
-                val totalPages = firstPageResponse.data?.info?.pages ?: 1
-
-                if (firstPageResponse.error != null) {
-                    _error.value = firstPageResponse.error.message
-                    return@launch
-                }
+                val totalPages = firstPageResponse.info.pages
 
                 val locationList = (1..totalPages).map { currentPage ->
                     async {
-                        repository.getLocationList(currentPage).data?.results.orEmpty()
+                        repository.getLocationList(currentPage).results
                     }
                 }.awaitAll().flatten()
 
@@ -126,11 +125,13 @@ data class LocationScreenState(
     val searchQuery: String = "",
     val typeQuery: String = "",
     val dimensionQuery: String = "",
+    val onlyFavorites: Boolean = false
 ) {
     val filteredLocations: List<Location>
         get() = locations.filter { location ->
             location.name.contains(searchQuery, ignoreCase = true) &&
             (typeQuery.isEmpty() || location.type.equals(typeQuery, ignoreCase = true)) &&
-            (dimensionQuery.isEmpty() || location.dimension.equals(dimensionQuery, ignoreCase = true))
+            (dimensionQuery.isEmpty() || location.dimension.equals(dimensionQuery, ignoreCase = true)) &&
+            (!onlyFavorites || favoriteLocationIds.contains(location.id.toString()))
         }
 }

@@ -10,7 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rickandmorty.viewmodel.LocationViewModel
+import com.example.rickandmorty.viewmodel.location.LocationViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +38,12 @@ fun LocationBottomSheet(onDismissRequest: () -> Unit, viewModel: LocationViewMod
                 suggestions = dimensionSuggestions,
                 onSuggestionSelected = { viewModel.updateDimensionSuggestions(it) },
                 clearSearch = { viewModel.updateDimensionQuery("") }
+            )
+
+            FilterCheckbox(
+                label = "Only Favorites",
+                isSelected = state.onlyFavorites,
+                onCheckedChange = viewModel::updateOnlyFavorites
             )
         }
     }

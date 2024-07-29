@@ -1,4 +1,4 @@
-package com.example.rickandmorty.navigation
+package com.example.rickandmorty.navigation.character
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,8 +20,8 @@ import com.example.rickandmorty.components.details_screen_ui.EpisodeCard
 import com.example.rickandmorty.components.LoadingIndicator
 import com.example.rickandmorty.components.details_screen_ui.CharacterDetailsHeader
 import com.example.rickandmorty.components.navigation_ui.Screen
-import com.example.rickandmorty.viewmodel.CharacterDetailsViewModel
-import com.example.rickandmorty.viewmodel.CharacterEpisodeViewModel
+import com.example.rickandmorty.viewmodel.character.CharacterDetailsViewModel
+import com.example.rickandmorty.viewmodel.character.CharacterEpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -54,9 +54,9 @@ fun CharacterDetailsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            if (characterError != null) {
+            if (characterError != null || episodeError != null) {
                 Text(
-                    text = characterError!!,
+                    text = characterError ?: episodeError!!,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.Red

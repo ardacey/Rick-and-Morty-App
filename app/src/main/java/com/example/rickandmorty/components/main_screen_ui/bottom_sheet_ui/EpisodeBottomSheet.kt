@@ -2,15 +2,20 @@ package com.example.rickandmorty.components.main_screen_ui.bottom_sheet_ui
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import com.example.rickandmorty.viewmodel.EpisodeViewModel
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.rickandmorty.viewmodel.episode.EpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -23,6 +28,7 @@ fun EpisodeBottomSheet(onDismissRequest: () -> Unit, viewModel: EpisodeViewModel
     val dateState = rememberDateRangePickerState()
     val startDateMillis by rememberUpdatedState(dateState.selectedStartDateMillis)
     val endDateMillis by rememberUpdatedState(dateState.selectedEndDateMillis)
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(startDateMillis, endDateMillis) {
         viewModel.updateStartDate(startDateMillis?.toLocalDate() ?: LocalDate.MIN)
@@ -30,6 +36,14 @@ fun EpisodeBottomSheet(onDismissRequest: () -> Unit, viewModel: EpisodeViewModel
     }
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
+        FilterCheckbox(
+            label = "Only Favorites",
+            isSelected = state.onlyFavorites,
+            onCheckedChange = viewModel::updateOnlyFavorites
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         DateRangePicker(state = dateState)
     }
 }

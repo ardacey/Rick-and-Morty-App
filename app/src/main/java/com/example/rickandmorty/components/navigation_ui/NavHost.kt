@@ -24,23 +24,17 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.rickandmorty.components.main_screen_ui.TopBar
-import com.example.rickandmorty.navigation.CharacterDetailsScreen
-import com.example.rickandmorty.navigation.CharacterFavorites
-import com.example.rickandmorty.navigation.CharactersScreen
-import com.example.rickandmorty.navigation.EpisodeDetailsScreen
-import com.example.rickandmorty.navigation.EpisodeFavorites
-import com.example.rickandmorty.navigation.EpisodesScreen
-import com.example.rickandmorty.navigation.LocationDetailsScreen
-import com.example.rickandmorty.navigation.LocationFavorites
-import com.example.rickandmorty.navigation.LocationsScreen
+import com.example.rickandmorty.navigation.character.CharacterDetailsScreen
+import com.example.rickandmorty.navigation.character.CharactersScreen
+import com.example.rickandmorty.navigation.episode.EpisodeDetailsScreen
+import com.example.rickandmorty.navigation.episode.EpisodesScreen
+import com.example.rickandmorty.navigation.location.LocationDetailsScreen
+import com.example.rickandmorty.navigation.location.LocationsScreen
 
 sealed class Screen(val route: String) {
     data object Characters : Screen("characters")
     data object Locations : Screen("locations")
     data object Episodes : Screen("episodes")
-    data object CharacterFavorites : Screen("character_favorites")
-    data object LocationFavorites : Screen("location_favorites")
-    data object EpisodeFavorites : Screen("episode_favorites")
     data object CharacterDetails : Screen("character_details/{characterId}") {
         fun createRoute(characterId: Int) = "character_details/$characterId"
     }
@@ -100,7 +94,6 @@ fun Navigation(
                         TopBar(
                             isDarkMode = isDarkMode,
                             onDarkModeToggle = onDarkModeToggle,
-                            onClick = { navController.navigate(Screen.CharacterFavorites.route) }
                             )
                     }
                     CharactersScreen(navController)
@@ -138,7 +131,6 @@ fun Navigation(
                         TopBar(
                             isDarkMode = isDarkMode,
                             onDarkModeToggle = onDarkModeToggle,
-                            onClick = { navController.navigate(Screen.LocationFavorites.route) }
                         )
                     }
                     LocationsScreen(navController)
@@ -170,20 +162,10 @@ fun Navigation(
                         TopBar(
                             isDarkMode = isDarkMode,
                             onDarkModeToggle = onDarkModeToggle,
-                            onClick = { navController.navigate(Screen.EpisodeFavorites.route) }
                         )
                     }
                     EpisodesScreen(navController)
                 }
-            }
-            composable(Screen.CharacterFavorites.route) {
-                CharacterFavorites(navController)
-            }
-            composable(Screen.LocationFavorites.route) {
-                LocationFavorites(navController)
-            }
-            composable(Screen.EpisodeFavorites.route) {
-                EpisodeFavorites(navController)
             }
             composable(
                 Screen.CharacterDetails.route,

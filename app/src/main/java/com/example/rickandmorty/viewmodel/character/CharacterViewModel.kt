@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.character
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -82,6 +82,10 @@ class CharacterViewModel(
             .let { _typeSuggestions.value = it }
     }
 
+    fun updateOnlyFavorites(onlyFavorites: Boolean) {
+        _state.update { it.copy(onlyFavorites = onlyFavorites) }
+    }
+
     private fun observeFavoriteCharacters() {
         viewModelScope.launch {
             preferencesManager.favoriteCharactersFlow.collectLatest { favoriteCharacters ->
@@ -106,16 +110,11 @@ class CharacterViewModel(
         viewModelScope.launch {
             try {
                 val firstPageResponse = repository.getCharacterList(1)
-                val totalPages = firstPageResponse.data?.info?.pages ?: 1
-
-                if (firstPageResponse.error != null) {
-                    _error.value = firstPageResponse.error.message
-                    return@launch
-                }
+                val totalPages = firstPageResponse.info.pages
 
                 val characterList = (1..totalPages).map { page ->
                     async {
-                        repository.getCharacterList(page).data?.results.orEmpty()
+                        repository.getCharacterList(page).results
                     }
                 }.awaitAll().flatten()
 
@@ -137,6 +136,7 @@ data class CharacterScreenState(
     val typeQuery: String = "",
     val statusFilter: String = "",
     val genderFilter: String = "",
+    val onlyFavorites: Boolean = false
 ) {
     val filteredCharacters: List<Character>
         get() = characters.filter { character ->
@@ -144,6 +144,7 @@ data class CharacterScreenState(
             (statusFilter.isEmpty() || character.status.equals(statusFilter, ignoreCase = true)) &&
             (genderFilter.isEmpty() || character.gender.equals(genderFilter, ignoreCase = true)) &&
             (speciesQuery.isEmpty() || character.species.equals(speciesQuery, ignoreCase = true)) &&
-            (typeQuery.isEmpty() || character.type.equals(typeQuery, ignoreCase = true))
+            (typeQuery.isEmpty() || character.type.equals(typeQuery, ignoreCase = true)) &&
+            (!onlyFavorites || favoriteCharacterIds.contains(character.id.toString()))
         }
 }

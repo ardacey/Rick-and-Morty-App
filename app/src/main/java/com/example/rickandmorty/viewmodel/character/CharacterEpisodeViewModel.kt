@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.character
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,11 +31,7 @@ class CharacterEpisodeViewModel(
                 val episodeIDs = episodeURLs.map { it.substringAfterLast("/").toInt() }
                 val deferredEpisodes = episodeIDs.map { id ->
                     async {
-                        val response = repository.getEpisode(id)
-                        if (response.error != null) {
-                            throw Exception(response.error.message)
-                        }
-                        response.data!!
+                        repository.getEpisode(id)
                     }
                 }
 

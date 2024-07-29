@@ -1,4 +1,4 @@
-package com.example.rickandmorty.navigation
+package com.example.rickandmorty.navigation.character
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +21,7 @@ import com.example.rickandmorty.components.main_screen_ui.CharacterUI
 import com.example.rickandmorty.components.LoadingIndicator
 import com.example.rickandmorty.components.navigation_ui.Screen
 import com.example.rickandmorty.components.main_screen_ui.SearchBar
-import com.example.rickandmorty.viewmodel.CharacterViewModel
+import com.example.rickandmorty.viewmodel.character.CharacterViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -39,7 +39,7 @@ fun CharactersScreen(
     ) {
         SearchBar(
             state.searchQuery,
-            {viewModel.updateSearchQuery(it)},
+            viewModel::updateSearchQuery,
             "Search Characters",
             showOptionsSheet = { showBottomSheet.value = true },
             clearSearch = { viewModel.updateSearchQuery("") }

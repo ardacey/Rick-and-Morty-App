@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,13 +26,14 @@ class LocationDetailsViewModel(
     fun getLocation(id : Int) {
         _isLoading.value = true
         viewModelScope.launch {
-            val response = repository.getLocation(id)
-            if (response.error != null) {
-                _error.value = response.error.message
-                return@launch
+            try {
+                val response = repository.getLocation(id)
+                _state.update { it.copy(location = response) }
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
             }
-            _state.update { it.copy(location = response.data!!) }
-            _isLoading.value = false
         }
     }
 }

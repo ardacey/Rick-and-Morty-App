@@ -1,4 +1,4 @@
-package com.example.rickandmorty.viewmodel
+package com.example.rickandmorty.viewmodel.episode
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -53,6 +53,10 @@ class EpisodeViewModel(
         _state.update { it.copy(endDate = endDate) }
     }
 
+    fun updateOnlyFavorites(onlyFavorites: Boolean) {
+        _state.update { it.copy(onlyFavorites = onlyFavorites) }
+    }
+
     private fun observeFavoriteEpisodes() {
         viewModelScope.launch {
             preferencesManager.favoriteEpisodesFlow.collect { favoriteEpisodes ->
@@ -77,16 +81,11 @@ class EpisodeViewModel(
         viewModelScope.launch {
             try {
                 val firstPageResponse = repository.getEpisodeList(1)
-                val totalPages = firstPageResponse.data?.info?.pages ?: 1
-
-                if (firstPageResponse.error != null) {
-                    _error.value = firstPageResponse.error.message
-                    return@launch
-                }
+                val totalPages = firstPageResponse.info.pages
 
                 val episodeList = (1..totalPages).map { currentPage ->
                     async {
-                        repository.getEpisodeList(currentPage).data?.results.orEmpty()
+                        repository.getEpisodeList(currentPage).results
                     }
                 }.awaitAll().flatten()
 
@@ -105,7 +104,8 @@ data class EpisodeScreenState(
     val favoriteEpisodeIds: Set<String> = emptySet(),
     val searchQuery: String = "",
     val startDate: LocalDate? = null,
-    val endDate: LocalDate? = null
+    val endDate: LocalDate? = null,
+    val onlyFavorites: Boolean = false
 ) {
     val filteredEpisodes: List<Episode>
         @RequiresApi(Build.VERSION_CODES.O)
@@ -114,8 +114,9 @@ data class EpisodeScreenState(
             val airDate = toLocalDate(episode.airDate)
             val withinDateRange = (startDate == null || airDate >= startDate) &&
                     (endDate == null || airDate <= endDate)
+            val isFavorite = favoriteEpisodeIds.contains(episode.id.toString())
 
-            matchesQuery && withinDateRange
+            matchesQuery && withinDateRange && (!onlyFavorites || isFavorite)
         }
 
     @RequiresApi(Build.VERSION_CODES.O)

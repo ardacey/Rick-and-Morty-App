@@ -1,4 +1,4 @@
-package com.example.rickandmorty.navigation
+package com.example.rickandmorty.navigation.location
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +22,7 @@ import com.example.rickandmorty.components.main_screen_ui.bottom_sheet_ui.Locati
 import com.example.rickandmorty.components.main_screen_ui.LocationUI
 import com.example.rickandmorty.components.navigation_ui.Screen
 import com.example.rickandmorty.components.main_screen_ui.SearchBar
-import com.example.rickandmorty.viewmodel.LocationViewModel
+import com.example.rickandmorty.viewmodel.location.LocationViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -40,7 +40,7 @@ fun LocationsScreen(
     ) {
         SearchBar(
             state.searchQuery,
-            {viewModel.updateSearchQuery(it)},
+            viewModel::updateSearchQuery,
             "Search Locations",
             showOptionsSheet = { showBottomSheet.value = true },
             clearSearch = { viewModel.updateSearchQuery("") }
