@@ -1,7 +1,7 @@
 package com.example.rickandmorty.repository
 
-import com.example.rickandmorty.model.Location
-import com.example.rickandmorty.model.LocationList
+import com.example.rickandmorty.model.location.Location
+import com.example.rickandmorty.model.location.LocationList
 import com.example.rickandmorty.service.LocationAPI
 
 interface LocationDownload {

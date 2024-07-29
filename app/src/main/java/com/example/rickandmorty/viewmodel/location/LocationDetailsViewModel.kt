@@ -2,7 +2,7 @@ package com.example.rickandmorty.viewmodel.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rickandmorty.model.Location
+import com.example.rickandmorty.model.location.Location
 import com.example.rickandmorty.repository.LocationDownload
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

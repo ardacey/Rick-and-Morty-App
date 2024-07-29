@@ -2,7 +2,7 @@ package com.example.rickandmorty.viewmodel.character
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rickandmorty.model.Episode
+import com.example.rickandmorty.model.episode.Episode
 import com.example.rickandmorty.repository.EpisodeDownload
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow

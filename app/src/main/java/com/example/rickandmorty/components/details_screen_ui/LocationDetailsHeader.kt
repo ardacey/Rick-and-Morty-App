@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rickandmorty.model.Location
+import com.example.rickandmorty.model.location.Location
 
 @Composable
 fun LocationDetailsHeader(location : Location) {

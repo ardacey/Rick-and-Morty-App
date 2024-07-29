@@ -3,7 +3,7 @@ package com.example.rickandmorty.viewmodel.character
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.data.PreferencesManager
-import com.example.rickandmorty.model.Character
+import com.example.rickandmorty.model.character.Character
 import com.example.rickandmorty.repository.CharacterDownload
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

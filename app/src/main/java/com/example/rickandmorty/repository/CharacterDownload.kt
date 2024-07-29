@@ -1,7 +1,7 @@
 package com.example.rickandmorty.repository
 
-import com.example.rickandmorty.model.Character
-import com.example.rickandmorty.model.CharacterList
+import com.example.rickandmorty.model.character.Character
+import com.example.rickandmorty.model.character.CharacterList
 import com.example.rickandmorty.service.CharacterAPI
 
 interface CharacterDownload {

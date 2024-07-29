@@ -1,4 +1,4 @@
-package com.example.rickandmorty.model
+package com.example.rickandmorty.model.character
 
 data class Character(
     val id: Int = 0,

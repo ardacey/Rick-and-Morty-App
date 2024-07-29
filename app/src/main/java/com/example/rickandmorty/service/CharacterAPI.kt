@@ -1,7 +1,7 @@
 package com.example.rickandmorty.service
 
-import com.example.rickandmorty.model.CharacterList
-import com.example.rickandmorty.model.Character
+import com.example.rickandmorty.model.character.CharacterList
+import com.example.rickandmorty.model.character.Character
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

@@ -1,7 +1,7 @@
 package com.example.rickandmorty.repository
 
-import com.example.rickandmorty.model.Episode
-import com.example.rickandmorty.model.EpisodeList
+import com.example.rickandmorty.model.episode.Episode
+import com.example.rickandmorty.model.episode.EpisodeList
 import com.example.rickandmorty.service.EpisodeAPI
 
 interface EpisodeDownload {

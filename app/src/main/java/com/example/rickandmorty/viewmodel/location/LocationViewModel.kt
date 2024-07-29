@@ -3,7 +3,7 @@ package com.example.rickandmorty.viewmodel.location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.data.PreferencesManager
-import com.example.rickandmorty.model.Location
+import com.example.rickandmorty.model.location.Location
 import com.example.rickandmorty.repository.LocationDownload
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
