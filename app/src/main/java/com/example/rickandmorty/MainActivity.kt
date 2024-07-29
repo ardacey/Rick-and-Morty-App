@@ -17,23 +17,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.rickandmorty.di.appModule
 import com.example.rickandmorty.components.navigation_ui.Navigation
 import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.ui.theme.RickAndMortyTheme
 import kotlinx.coroutines.launch
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.startKoin
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        startKoin {
-            androidContext(this@MainActivity)
-            modules(appModule)
-        }
 
         val preferencesManager = PreferencesManager(this)
 
