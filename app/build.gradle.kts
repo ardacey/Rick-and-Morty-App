@@ -75,7 +75,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.messaging)
+    implementation(libs.google.firebase.messaging)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
