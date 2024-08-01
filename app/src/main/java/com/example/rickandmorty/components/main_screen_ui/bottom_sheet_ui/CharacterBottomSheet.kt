@@ -25,24 +25,13 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         Column {
-            Text(
-                text = "Species:",
-                modifier = Modifier.padding(horizontal = 20.dp),
-                style = MaterialTheme.typography.displayMedium
-            )
-
             SearchFilter(
                 searchQuery = state.speciesQuery,
                 onValueChange = { viewModel.updateSpeciesQuery(it) },
                 suggestions = speciesSuggestions,
                 onSuggestionSelected = { viewModel.updateSpeciesSuggestions(it) },
-                clearSearch = { viewModel.updateSpeciesQuery("") }
-            )
-
-            Text(
-                text = "Type:",
-                modifier = Modifier.padding(horizontal = 20.dp),
-                style = MaterialTheme.typography.displayMedium
+                clearSearch = { viewModel.updateSpeciesQuery("") },
+                placeholderText = "Species"
             )
 
             SearchFilter(
@@ -50,10 +39,9 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                 onValueChange = { viewModel.updateTypeQuery(it) },
                 suggestions = typeSuggestions,
                 onSuggestionSelected = { viewModel.updateTypeSuggestions(it) },
-                clearSearch = { viewModel.updateTypeQuery("") }
+                clearSearch = { viewModel.updateTypeQuery("") },
+                placeholderText = "Type"
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             FilterCheckbox(
                 label = "Only Favorites",
@@ -64,7 +52,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Status:",
+                text = "Status",
                 modifier = Modifier.padding(horizontal = 20.dp),
                 style = MaterialTheme.typography.displayMedium
             )
@@ -96,7 +84,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Gender:",
+                text = "Gender",
                 modifier = Modifier.padding(horizontal = 20.dp),
                 style = MaterialTheme.typography.displayMedium
             )

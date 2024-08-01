@@ -4,16 +4,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,34 +31,29 @@ fun SearchBar(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-    ) {
-        TextField(
-            value = searchQuery,
-            onValueChange = onValueChange,
-            placeholder = { Text(
-                text = placeholderText,
-                style = MaterialTheme.typography.displayMedium) },
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 1,
-            leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Search") },
-            trailingIcon = {
-                if (isFocused) {
-                    IconButton(onClick = { clearSearch?.invoke() }) {
-                        Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear")
-                    }
-                } else {
-                    if (showOptionsSheet != null) {
-                        IconButton(onClick = { showOptionsSheet() }) {
-                            Icon(imageVector = Icons.Filled.Settings, contentDescription = "Options")
-                        }
+    OutlinedTextField(
+        value = searchQuery,
+        onValueChange = onValueChange,
+        placeholder = { Text(
+            text = placeholderText,
+            style = MaterialTheme.typography.displayMedium) },
+        shape = RoundedCornerShape(15),
+        modifier = Modifier.fillMaxWidth().padding(10.dp),
+        maxLines = 1,
+        leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Search") },
+        trailingIcon = {
+            if (isFocused) {
+                IconButton(onClick = { clearSearch?.invoke() }) {
+                    Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear")
+                }
+            } else {
+                if (showOptionsSheet != null) {
+                    IconButton(onClick = { showOptionsSheet() }) {
+                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "Options")
                     }
                 }
-            },
-            interactionSource = interactionSource
-        )
-    }
+            }
+        },
+        interactionSource = interactionSource
+    )
 }

@@ -19,14 +19,15 @@ fun SearchFilter(
     onValueChange: (String) -> Unit,
     suggestions: List<String>,
     onSuggestionSelected: (String) -> Unit,
-    clearSearch: () -> Unit
+    clearSearch: () -> Unit,
+    placeholderText: String
 ) {
     val showSuggestions = searchQuery.isNotEmpty() && suggestions.isNotEmpty()
     Column {
         SearchBar(
             searchQuery = searchQuery,
             onValueChange = onValueChange,
-            placeholderText = "",
+            placeholderText = placeholderText,
             clearSearch = clearSearch
         )
     }

@@ -3,6 +3,7 @@ package com.example.rickandmorty.components.main_screen_ui.bottom_sheet_ui
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,4 +27,5 @@ fun FilterCheckbox(
         )
         Text(text = label, style = MaterialTheme.typography.displayMedium)
     }
+    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 }
