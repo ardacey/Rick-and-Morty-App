@@ -2,7 +2,7 @@ package com.example.rickandmorty.repository
 
 import com.example.rickandmorty.model.episode.Episode
 import com.example.rickandmorty.model.episode.EpisodeList
-import com.example.rickandmorty.service.EpisodeAPI
+import com.example.rickandmorty.service.API.EpisodeAPI
 
 interface EpisodeDownload {
     suspend fun getEpisodeList(page: Int): EpisodeList

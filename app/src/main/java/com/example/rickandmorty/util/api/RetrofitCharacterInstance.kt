@@ -1,6 +1,6 @@
 package com.example.rickandmorty.util.api
 
-import com.example.rickandmorty.service.CharacterAPI
+import com.example.rickandmorty.service.API.CharacterAPI
 import com.example.rickandmorty.util.Util.BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

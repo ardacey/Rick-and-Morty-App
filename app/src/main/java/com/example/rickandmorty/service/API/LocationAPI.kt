@@ -1,4 +1,4 @@
-package com.example.rickandmorty.service
+package com.example.rickandmorty.service.API
 
 import com.example.rickandmorty.model.location.Location
 import com.example.rickandmorty.model.location.LocationList

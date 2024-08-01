@@ -2,7 +2,7 @@ package com.example.rickandmorty.repository
 
 import com.example.rickandmorty.model.character.Character
 import com.example.rickandmorty.model.character.CharacterList
-import com.example.rickandmorty.service.CharacterAPI
+import com.example.rickandmorty.service.API.CharacterAPI
 
 interface CharacterDownload {
     suspend fun getCharacterList(page: Int) : CharacterList

@@ -2,7 +2,7 @@ package com.example.rickandmorty.repository
 
 import com.example.rickandmorty.model.location.Location
 import com.example.rickandmorty.model.location.LocationList
-import com.example.rickandmorty.service.LocationAPI
+import com.example.rickandmorty.service.API.LocationAPI
 
 interface LocationDownload {
     suspend fun getLocationList(page: Int): LocationList
