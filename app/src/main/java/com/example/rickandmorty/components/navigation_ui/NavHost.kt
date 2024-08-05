@@ -24,6 +24,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.rickandmorty.components.main_screen_ui.TopBar
+import com.example.rickandmorty.navigation.Settings
 import com.example.rickandmorty.navigation.character.CharacterDetailsScreen
 import com.example.rickandmorty.navigation.character.CharactersScreen
 import com.example.rickandmorty.navigation.episode.EpisodeDetailsScreen
@@ -35,6 +36,7 @@ sealed class Screen(val route: String) {
     data object Characters : Screen("characters")
     data object Locations : Screen("locations")
     data object Episodes : Screen("episodes")
+    data object Settings : Screen("settings")
     data object CharacterDetails : Screen("character_details/{characterId}") {
         fun createRoute(characterId: Int) = "character_details/$characterId"
     }
@@ -92,8 +94,7 @@ fun Navigation(
                 Column {
                     if (currentRoute == Screen.Characters.route) {
                         TopBar(
-                            isDarkMode = isDarkMode,
-                            onDarkModeToggle = onDarkModeToggle,
+                            navController = navController
                             )
                     }
                     CharactersScreen(navController)
@@ -129,8 +130,7 @@ fun Navigation(
                 Column {
                     if (currentRoute == Screen.Locations.route) {
                         TopBar(
-                            isDarkMode = isDarkMode,
-                            onDarkModeToggle = onDarkModeToggle,
+                            navController = navController
                         )
                     }
                     LocationsScreen(navController)
@@ -160,12 +160,14 @@ fun Navigation(
                 Column {
                     if (currentRoute == Screen.Episodes.route) {
                         TopBar(
-                            isDarkMode = isDarkMode,
-                            onDarkModeToggle = onDarkModeToggle,
+                            navController = navController
                         )
                     }
                     EpisodesScreen(navController)
                 }
+            }
+            composable(Screen.Settings.route) {
+                Settings(navController, isDarkMode, onDarkModeToggle, "1.0")
             }
             composable(
                 Screen.CharacterDetails.route,

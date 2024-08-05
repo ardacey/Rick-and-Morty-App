@@ -27,7 +27,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CharacterDetailsScreen(
     id : Int?,
-    navController: NavController?,
+    navController: NavController,
     characterViewModel: CharacterDetailsViewModel = koinViewModel(),
     episodeViewModel: CharacterEpisodeViewModel = koinViewModel()) {
 
@@ -91,7 +91,7 @@ fun CharacterDetailsScreen(
                 EpisodeCard(
                     episodes[index]
                 ) {
-                    navController?.navigate(
+                    navController.navigate(
                         Screen.EpisodeDetails.createRoute(episodes[index].id))
                 }
             }

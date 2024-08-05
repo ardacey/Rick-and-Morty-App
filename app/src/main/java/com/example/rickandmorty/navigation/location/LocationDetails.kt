@@ -29,7 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LocationDetailsScreen(
-    id : Int?, navController: NavController?,
+    id : Int?, navController: NavController,
     locationViewModel: LocationDetailsViewModel = koinViewModel(),
     characterViewModel: LocationCharacterViewModel = koinViewModel()) {
 
@@ -93,7 +93,7 @@ fun LocationDetailsScreen(
                         CharacterCard(
                             character,
                             onClick = {
-                                navController?.navigate(
+                                navController.navigate(
                                     Screen.CharacterDetails.createRoute(character.id)
                                 )
                             }

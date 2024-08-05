@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +49,7 @@ fun SearchBar(
             } else {
                 if (showOptionsSheet != null) {
                     IconButton(onClick = { showOptionsSheet() }) {
-                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "Options")
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Options")
                     }
                 }
             }
