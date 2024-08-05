@@ -77,6 +77,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.google.firebase.messaging)
 
+    implementation("androidx.core:core-splashscreen:1.0.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
