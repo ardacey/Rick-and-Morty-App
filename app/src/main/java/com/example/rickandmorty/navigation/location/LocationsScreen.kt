@@ -38,9 +38,9 @@ fun LocationsScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         SearchBar(
-            state.searchQuery,
-            viewModel::updateSearchQuery,
-            "Search Locations",
+            searchQuery = state.searchQuery,
+            onValueChange = viewModel::updateSearchQuery,
+            placeholderText = "Search Locations",
             showOptionsSheet = { showBottomSheet.value = true },
             clearSearch = { viewModel.updateSearchQuery("") }
         )
