@@ -1,14 +1,11 @@
 package com.example.rickandmorty.viewmodel.episode
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.data.PreferencesManager
-import com.example.rickandmorty.model.episode.Episode
-import com.example.rickandmorty.repository.EpisodeDownload
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import com.example.rickandmorty.data.model.basemodel.AppResult
+import com.example.rickandmorty.data.model.episode.Episode
+import com.example.rickandmorty.repository.EpisodeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +17,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class EpisodeViewModel(
-    private val repository: EpisodeDownload
+    private val repository: EpisodeRepository
 ) : ViewModel(), KoinComponent {
 
     private val preferencesManager: PreferencesManager by inject()
@@ -30,9 +27,6 @@ class EpisodeViewModel(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private var favoriteEpisodes = emptySet<String>()
 
@@ -77,24 +71,25 @@ class EpisodeViewModel(
     }
 
     private fun getEpisodes() {
-        _isLoading.value = true
+        _state.update { it.copy(loading = true) }
         viewModelScope.launch {
-            try {
-                val firstPageResponse = repository.getEpisodeList(1)
-                val totalPages = firstPageResponse.info.pages
-
-                val episodeList = (1..totalPages).map { currentPage ->
-                    async {
-                        repository.getEpisodeList(currentPage).results
+            var episodeList = emptyList<Episode>()
+            when (val firstPageResult = repository.getEpisodeList(1)) {
+                is AppResult.Success -> {
+                    val totalPages = firstPageResult.successData.info.pages
+                    episodeList = (1..totalPages).flatMap { page ->
+                        when (val response = repository.getEpisodeList(page)) {
+                            is AppResult.Success -> response.successData.results
+                            is AppResult.Error -> emptyList()
+                        }
                     }
-                }.awaitAll().flatten()
-
-                _state.update { it.copy(episodes = episodeList) }
-            } catch (e: Exception) {
-                _error.value = e.message
-            } finally {
-                _isLoading.value = false
+                }
+                is AppResult.Error -> {
+                    _error.value = firstPageResult.message
+                }
             }
+            _state.update { it.copy(episodes = episodeList) }
+            _state.update { it.copy(loading = false) }
         }
     }
 }
@@ -105,10 +100,10 @@ data class EpisodeScreenState(
     val searchQuery: String = "",
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
-    val onlyFavorites: Boolean = false
+    val onlyFavorites: Boolean = false,
+    val loading: Boolean = false
 ) {
     val filteredEpisodes: List<Episode>
-        @RequiresApi(Build.VERSION_CODES.O)
         get() = episodes.filter { episode ->
             val matchesQuery = episode.name.contains(searchQuery, ignoreCase = true)
             val airDate = toLocalDate(episode.airDate)
@@ -119,8 +114,7 @@ data class EpisodeScreenState(
             matchesQuery && withinDateRange && (!onlyFavorites || isFavorite)
         }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun toLocalDate(dateString: String): LocalDate {
+    private fun toLocalDate(dateString: String): LocalDate {
         val formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
         return LocalDate.parse(dateString, formatter)
     }

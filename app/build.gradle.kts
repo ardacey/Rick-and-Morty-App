@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.rickandmorty"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -77,7 +77,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.google.firebase.messaging)
 
-    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation(libs.androidx.core.splashscreen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -31,7 +31,6 @@ fun LocationsScreen(
     viewModel: LocationViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val showBottomSheet = remember { mutableStateOf(false) }
 
@@ -53,7 +52,7 @@ fun LocationsScreen(
                 textAlign = TextAlign.Center,
                 color = Color.Red
             )
-        } else if (isLoading) {
+        } else if (state.loading) {
             LoadingIndicator()
         } else {
             LazyVerticalGrid(

@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,74 +21,52 @@ import com.example.rickandmorty.components.details_screen_ui.CharacterCard
 import com.example.rickandmorty.components.LoadingIndicator
 import com.example.rickandmorty.components.details_screen_ui.EpisodeDetailsHeader
 import com.example.rickandmorty.components.navigation_ui.Screen
-import com.example.rickandmorty.viewmodel.episode.EpisodeCharacterViewModel
 import com.example.rickandmorty.viewmodel.episode.EpisodeDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EpisodeDetailsScreen(
-    id : Int?, navController: NavController,
-    episodeViewModel: EpisodeDetailsViewModel = koinViewModel(),
-    characterViewModel: EpisodeCharacterViewModel = koinViewModel()) {
+    id : Int?,
+    navController: NavController
+) {
 
-    val isCharacterLoading by characterViewModel.isLoading.collectAsState()
-    val episodeState by episodeViewModel.state.collectAsState()
-    val episodeError by episodeViewModel.error.collectAsState()
-    val charactersState by characterViewModel.state.collectAsState()
-    val characterError by characterViewModel.error.collectAsState()
-
-    LaunchedEffect(id) {
-        id?.let { episodeViewModel.getEpisode(it) }
+    val viewModel = koinViewModel<EpisodeDetailsViewModel> {
+        parametersOf(id)
     }
-
-    val episode = episodeState.episode
-
-    LaunchedEffect(episode.characters) {
-        characterViewModel.getCharacters(episode.characters)
-    }
-
-    val characters = charactersState.characters
+    val state by viewModel.state.collectAsState()
+    val error by viewModel.error.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            if (episodeError != null || characterError != null) {
+            if (error != null) {
                 Text(
-                    text = episodeError ?: characterError!!,
+                    text = error!!,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.Red
                 )
-            } else { EpisodeDetailsHeader(episode) }
+            } else { EpisodeDetailsHeader(state.episode) }
             Text(
-                text = "Characters (${characters.size})",
+                text = "Characters (${state.characters.size})",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.titleLarge,
             )
         }
-        if (characterError != null) {
-            item {
-                Text(
-                    text = characterError!!,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
-                    style = MaterialTheme.typography.displayMedium,
-                    color = Color.Red
-                )
-            }
-        } else if (isCharacterLoading) {
+        if (state.loading) {
             item { LoadingIndicator() }
-        }
-        else {
+        } else {
             item {
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     maxItemsInEachRow = 3,
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
-                    characters.forEach { character ->
+                    state.characters.forEach { character ->
                         CharacterCard(
                             character,
                             onClick = {

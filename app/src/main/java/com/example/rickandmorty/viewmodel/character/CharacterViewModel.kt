@@ -3,10 +3,9 @@ package com.example.rickandmorty.viewmodel.character
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.data.PreferencesManager
-import com.example.rickandmorty.model.character.Character
-import com.example.rickandmorty.repository.CharacterDownload
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import com.example.rickandmorty.data.model.basemodel.AppResult
+import com.example.rickandmorty.data.model.character.Character
+import com.example.rickandmorty.repository.CharacterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +16,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class CharacterViewModel(
-    private val repository: CharacterDownload
+    private val repository: CharacterRepository
 ) : ViewModel(), KoinComponent {
 
     private val preferencesManager: PreferencesManager by inject()
@@ -27,9 +26,6 @@ class CharacterViewModel(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _speciesSuggestions = MutableStateFlow<List<String>>(emptyList())
     val speciesSuggestions: StateFlow<List<String>> = _speciesSuggestions.asStateFlow()
@@ -106,24 +102,25 @@ class CharacterViewModel(
     }
 
     private fun getCharacters() {
-        _isLoading.value = true
+        _state.update { it.copy(loading = true) }
         viewModelScope.launch {
-            try {
-                val firstPageResponse = repository.getCharacterList(1)
-                val totalPages = firstPageResponse.info.pages
-
-                val characterList = (1..totalPages).map { page ->
-                    async {
-                        repository.getCharacterList(page).results
+            var characterList = emptyList<Character>()
+            when (val firstPageResult = repository.getCharacterList(1)) {
+                is AppResult.Success -> {
+                    val totalPages = firstPageResult.successData.info.pages
+                    characterList = (1..totalPages).flatMap { page ->
+                        when (val response = repository.getCharacterList(page)) {
+                            is AppResult.Success -> response.successData.results
+                            is AppResult.Error -> emptyList()
+                        }
                     }
-                }.awaitAll().flatten()
-
-                _state.update { it.copy(characters = characterList) }
-            } catch (e : Exception) {
-                _error.value = e.message
-            } finally {
-                _isLoading.value = false
+                }
+                is AppResult.Error -> {
+                    _error.value = firstPageResult.message
+                }
             }
+            _state.update { it.copy(characters = characterList) }
+            _state.update { it.copy(loading = false) }
         }
     }
 }
@@ -136,7 +133,8 @@ data class CharacterScreenState(
     val typeQuery: String = "",
     val statusFilter: String = "",
     val genderFilter: String = "",
-    val onlyFavorites: Boolean = false
+    val onlyFavorites: Boolean = false,
+    val loading: Boolean = false
 ) {
     val filteredCharacters: List<Character>
         get() = characters.filter { character ->

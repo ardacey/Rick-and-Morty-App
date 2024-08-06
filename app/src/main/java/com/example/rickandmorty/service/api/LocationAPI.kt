@@ -1,7 +1,7 @@
-package com.example.rickandmorty.service.API
+package com.example.rickandmorty.service.api
 
-import com.example.rickandmorty.model.location.Location
-import com.example.rickandmorty.model.location.LocationList
+import com.example.rickandmorty.data.model.location.Location
+import com.example.rickandmorty.data.model.location.LocationList
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

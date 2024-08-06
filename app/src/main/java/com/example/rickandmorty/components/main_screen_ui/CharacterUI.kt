@@ -29,7 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.rickandmorty.model.character.Character
+import com.example.rickandmorty.data.model.character.Character
 
 @Composable
 fun CharacterUI(

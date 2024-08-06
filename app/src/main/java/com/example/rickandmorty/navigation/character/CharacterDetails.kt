@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -21,47 +20,34 @@ import com.example.rickandmorty.components.LoadingIndicator
 import com.example.rickandmorty.components.details_screen_ui.CharacterDetailsHeader
 import com.example.rickandmorty.components.navigation_ui.Screen
 import com.example.rickandmorty.viewmodel.character.CharacterDetailsViewModel
-import com.example.rickandmorty.viewmodel.character.CharacterEpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CharacterDetailsScreen(
     id : Int?,
-    navController: NavController,
-    characterViewModel: CharacterDetailsViewModel = koinViewModel(),
-    episodeViewModel: CharacterEpisodeViewModel = koinViewModel()) {
+    navController: NavController
+) {
 
-    val isEpisodeLoading by episodeViewModel.isLoading.collectAsState()
-    val characterState by characterViewModel.state.collectAsState()
-    val episodesState by episodeViewModel.state.collectAsState()
-    val characterError by characterViewModel.error.collectAsState()
-    val episodeError by episodeViewModel.error.collectAsState()
-
-    LaunchedEffect(id) {
-        id?.let { characterViewModel.getCharacter(it) }
+    val viewModel = koinViewModel<CharacterDetailsViewModel>{
+        parametersOf(id)
     }
-
-    val character = characterState.character
-
-    LaunchedEffect(character.episode) {
-        episodeViewModel.getEpisodes(character.episode)
-    }
-
-    val episodes = episodesState.episodes
+    val state by viewModel.state.collectAsState()
+    val error by viewModel.error.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            if (characterError != null || episodeError != null) {
+            if (error != null) {
                 Text(
-                    text = characterError ?: episodeError!!,
+                    text = error!!,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.Red
                 )
-            } else { CharacterDetailsHeader(character) }
+            } else { CharacterDetailsHeader(state.character) }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -69,30 +55,21 @@ fun CharacterDetailsScreen(
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = "Episodes (${character.episode.size})",
+                    text = "Episodes (${state.episodes.size})",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(12.dp),
                 )
             }
         }
-        if (episodeError != null) {
-            item {
-                Text(
-                    text = episodeError!!,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
-                    style = MaterialTheme.typography.displayMedium,
-                    color = Color.Red
-                )
-            }
-        } else if (isEpisodeLoading) {
+        if (state.loading) {
             item { LoadingIndicator() }
         } else {
-            items(episodes.size) { index ->
+            items(state.episodes.size) { index ->
                 EpisodeCard(
-                    episodes[index]
+                    state.episodes[index]
                 ) {
                     navController.navigate(
-                        Screen.EpisodeDetails.createRoute(episodes[index].id))
+                        Screen.EpisodeDetails.createRoute(state.episodes[index].id))
                 }
             }
         }

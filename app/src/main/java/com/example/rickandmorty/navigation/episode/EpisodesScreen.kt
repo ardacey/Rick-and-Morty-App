@@ -1,7 +1,5 @@
 package com.example.rickandmorty.navigation.episode
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,14 +25,12 @@ import com.example.rickandmorty.components.main_screen_ui.SearchBar
 import com.example.rickandmorty.viewmodel.episode.EpisodeViewModel
 import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EpisodesScreen(
     navController: NavHostController,
     viewModel: EpisodeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val showBottomSheet = remember { mutableStateOf(false) }
 
@@ -56,7 +52,7 @@ fun EpisodesScreen(
                 textAlign = TextAlign.Center,
                 color = Color.Red
             )
-        } else if (isLoading) {
+        } else if (state.loading) {
             LoadingIndicator()
         } else {
             LazyVerticalGrid(

@@ -1,7 +1,5 @@
 package com.example.rickandmorty.components.main_screen_ui.bottom_sheet_ui
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.DateRangePicker
@@ -21,7 +19,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EpisodeBottomSheet(onDismissRequest: () -> Unit, viewModel: EpisodeViewModel = koinViewModel()) {
@@ -48,7 +45,6 @@ fun EpisodeBottomSheet(onDismissRequest: () -> Unit, viewModel: EpisodeViewModel
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 private fun Long.toLocalDate(): LocalDate {
     return Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
 }

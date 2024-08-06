@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.rickandmorty.model.character.Character
+import com.example.rickandmorty.data.model.character.Character
 
 @Composable
 fun CharacterDetailsHeader(character : Character) {

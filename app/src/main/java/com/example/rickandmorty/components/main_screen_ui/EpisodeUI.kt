@@ -24,7 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.rickandmorty.model.episode.Episode
+import com.example.rickandmorty.data.model.episode.Episode
 
 @Composable
 fun EpisodeUI(

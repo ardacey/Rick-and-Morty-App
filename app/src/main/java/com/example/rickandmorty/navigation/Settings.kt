@@ -238,7 +238,7 @@ fun Settings(
                     )
 
                     Text(
-                        text = "My E-mail Adress:",
+                        text = "My E-mail Address:",
                         style = MaterialTheme.typography.displayMedium,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )

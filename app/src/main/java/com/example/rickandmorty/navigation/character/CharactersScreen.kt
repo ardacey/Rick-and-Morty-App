@@ -30,7 +30,6 @@ fun CharactersScreen(
     viewModel: CharacterViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val showBottomSheet = remember { mutableStateOf(false) }
 
@@ -38,9 +37,9 @@ fun CharactersScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         SearchBar(
-            state.searchQuery,
-            viewModel::updateSearchQuery,
-            "Search Characters",
+            searchQuery = state.searchQuery,
+            onValueChange = viewModel::updateSearchQuery,
+            placeholderText = "Search Characters",
             showOptionsSheet = { showBottomSheet.value = true },
             clearSearch = { viewModel.updateSearchQuery("") }
         )
@@ -52,7 +51,7 @@ fun CharactersScreen(
                 textAlign = TextAlign.Center,
                 color = Color.Red
             )
-        } else if (isLoading) {
+        } else if (state.loading) {
             LoadingIndicator()
         } else {
             LazyColumn(

@@ -1,8 +1,6 @@
 package com.example.rickandmorty.components.navigation_ui
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -49,7 +47,6 @@ sealed class Screen(val route: String) {
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(
     isDarkMode: Boolean,

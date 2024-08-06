@@ -3,10 +3,9 @@ package com.example.rickandmorty.viewmodel.location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.data.PreferencesManager
-import com.example.rickandmorty.model.location.Location
-import com.example.rickandmorty.repository.LocationDownload
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import com.example.rickandmorty.data.model.basemodel.AppResult
+import com.example.rickandmorty.data.model.location.Location
+import com.example.rickandmorty.repository.LocationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +15,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class LocationViewModel(
-    private val repository: LocationDownload
+    private val repository: LocationRepository
 ) : ViewModel(), KoinComponent {
 
     private val preferencesManager: PreferencesManager by inject()
@@ -26,9 +25,6 @@ class LocationViewModel(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _typeSuggestions = MutableStateFlow<List<String>>(emptyList())
     val typeSuggestions: StateFlow<List<String>> = _typeSuggestions.asStateFlow()
@@ -97,24 +93,25 @@ class LocationViewModel(
     }
 
     private fun getLocations() {
-        _isLoading.value = true
+        _state.update { it.copy(loading = true) }
         viewModelScope.launch {
-            try {
-                val firstPageResponse = repository.getLocationList(1)
-                val totalPages = firstPageResponse.info.pages
-
-                val locationList = (1..totalPages).map { currentPage ->
-                    async {
-                        repository.getLocationList(currentPage).results
+            var locationList = emptyList<Location>()
+            when (val firstPageResult = repository.getLocationList(1)) {
+                is AppResult.Success -> {
+                    val totalPages = firstPageResult.successData.info.pages
+                    locationList = (1..totalPages).flatMap { page ->
+                        when (val response = repository.getLocationList(page)) {
+                            is AppResult.Success -> response.successData.results
+                            is AppResult.Error -> emptyList()
+                        }
                     }
-                }.awaitAll().flatten()
-
-                _state.update { it.copy(locations = locationList) }
-            } catch (e: Exception) {
-                _error.value = e.message
-            } finally {
-                _isLoading.value = false
+                }
+                is AppResult.Error -> {
+                    _error.value = firstPageResult.message
+                }
             }
+            _state.update { it.copy(locations = locationList) }
+            _state.update { it.copy(loading = false) }
         }
     }
 }
@@ -125,7 +122,8 @@ data class LocationScreenState(
     val searchQuery: String = "",
     val typeQuery: String = "",
     val dimensionQuery: String = "",
-    val onlyFavorites: Boolean = false
+    val onlyFavorites: Boolean = false,
+    val loading: Boolean = false
 ) {
     val filteredLocations: List<Location>
         get() = locations.filter { location ->
