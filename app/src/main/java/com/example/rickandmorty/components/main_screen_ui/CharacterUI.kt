@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -63,13 +62,11 @@ fun CharacterUI(
 
     Card(
         Modifier
-            .wrapContentSize()
             .padding(10.dp)
             .clickable { onClick.invoke() },
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             AsyncImage(
                 model = character.image,
                 contentDescription = character.name,

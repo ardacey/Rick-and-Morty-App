@@ -27,18 +27,18 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
         Column {
             SearchFilter(
                 searchQuery = state.speciesQuery,
-                onValueChange = { viewModel.updateSpeciesQuery(it) },
+                onValueChange = viewModel::updateSpeciesQuery,
                 suggestions = speciesSuggestions,
-                onSuggestionSelected = { viewModel.updateSpeciesSuggestions(it) },
+                onSuggestionSelected = viewModel::updateSpeciesSuggestions,
                 clearSearch = { viewModel.updateSpeciesQuery("") },
                 placeholderText = "Species"
             )
 
             SearchFilter(
                 searchQuery = state.typeQuery,
-                onValueChange = { viewModel.updateTypeQuery(it) },
+                onValueChange = viewModel::updateTypeQuery,
                 suggestions = typeSuggestions,
-                onSuggestionSelected = { viewModel.updateTypeSuggestions(it) },
+                onSuggestionSelected = viewModel::updateTypeSuggestions,
                 clearSearch = { viewModel.updateTypeQuery("") },
                 placeholderText = "Type"
             )

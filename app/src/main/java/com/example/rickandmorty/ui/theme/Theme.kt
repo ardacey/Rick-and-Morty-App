@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 
 
 /// Deprecated
+/*
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
@@ -23,6 +24,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = PurpleGrey40,
     tertiary = Pink40
 )
+*/
 
 @Composable
 fun RickAndMortyTheme(

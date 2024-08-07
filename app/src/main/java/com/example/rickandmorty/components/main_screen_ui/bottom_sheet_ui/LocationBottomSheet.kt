@@ -20,18 +20,18 @@ fun LocationBottomSheet(onDismissRequest: () -> Unit, viewModel: LocationViewMod
         Column {
             SearchFilter(
                 searchQuery = state.typeQuery,
-                onValueChange = { viewModel.updateTypeQuery(it) },
+                onValueChange = viewModel::updateTypeQuery,
                 suggestions = typeSuggestions,
-                onSuggestionSelected = { viewModel.updateTypeSuggestions(it) },
+                onSuggestionSelected = viewModel::updateTypeSuggestions,
                 clearSearch = { viewModel.updateTypeQuery("") },
                 placeholderText = "Type"
             )
 
             SearchFilter(
                 searchQuery = state.dimensionQuery,
-                onValueChange = { viewModel.updateDimensionQuery(it) },
+                onValueChange = viewModel::updateDimensionQuery,
                 suggestions = dimensionSuggestions,
-                onSuggestionSelected = { viewModel.updateDimensionSuggestions(it) },
+                onSuggestionSelected = viewModel::updateDimensionSuggestions,
                 clearSearch = { viewModel.updateDimensionQuery("") },
                 placeholderText = "Dimension"
             )

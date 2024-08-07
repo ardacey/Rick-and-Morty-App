@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -63,11 +62,7 @@ fun LocationUI(
             .clickable { onClick.invoke() },
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(10.dp)
-        ) {
+        Column(modifier = Modifier.padding(10.dp)) {
             Row(
                 modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

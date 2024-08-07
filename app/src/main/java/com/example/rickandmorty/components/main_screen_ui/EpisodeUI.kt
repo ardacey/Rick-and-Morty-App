@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -63,11 +62,7 @@ fun EpisodeUI(
             .clickable { onClick.invoke() },
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp)
-        ) {
+        Column(modifier = Modifier.padding(10.dp)) {
             Row(
                 modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

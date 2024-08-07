@@ -1,6 +1,5 @@
 package com.example.rickandmorty.components.navigation_ui
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -18,7 +17,6 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.rickandmorty.components.main_screen_ui.TopBar
@@ -46,14 +44,12 @@ sealed class Screen(val route: String) {
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Navigation(
     isDarkMode: Boolean,
     onDarkModeToggle: (Boolean) -> Unit,
 ){
     val navController = rememberNavController()
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val items = listOf(
         BottomNavItem("Characters", Icons.Filled.Face, Screen.Characters.route),
         BottomNavItem("Locations", Icons.Filled.LocationOn, Screen.Locations.route),
@@ -89,11 +85,7 @@ fun Navigation(
                 }
             ) {
                 Column {
-                    if (currentRoute == Screen.Characters.route) {
-                        TopBar(
-                            navController = navController
-                            )
-                    }
+                    TopBar(navController = navController)
                     CharactersScreen(navController)
                 }
             }
@@ -125,11 +117,7 @@ fun Navigation(
                 }
             ) {
                 Column {
-                    if (currentRoute == Screen.Locations.route) {
-                        TopBar(
-                            navController = navController
-                        )
-                    }
+                    TopBar(navController = navController)
                     LocationsScreen(navController)
                 }
             }
@@ -155,11 +143,7 @@ fun Navigation(
                 }
                 ) {
                 Column {
-                    if (currentRoute == Screen.Episodes.route) {
-                        TopBar(
-                            navController = navController
-                        )
-                    }
+                    TopBar(navController = navController)
                     EpisodesScreen(navController)
                 }
             }
