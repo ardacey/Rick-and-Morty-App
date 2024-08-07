@@ -19,7 +19,7 @@ fun FilterCheckbox(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Checkbox(
             checked = isSelected,

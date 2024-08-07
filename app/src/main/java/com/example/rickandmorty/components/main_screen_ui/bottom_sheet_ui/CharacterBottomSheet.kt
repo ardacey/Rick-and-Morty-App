@@ -81,7 +81,7 @@ fun CharacterBottomSheet(onDismissRequest: () -> Unit, viewModel: CharacterViewM
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Gender",
