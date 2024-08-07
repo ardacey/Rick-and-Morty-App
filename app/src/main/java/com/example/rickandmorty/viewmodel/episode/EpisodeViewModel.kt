@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class EpisodeViewModel(
     private val repository: EpisodeRepository
@@ -37,14 +35,6 @@ class EpisodeViewModel(
 
     fun updateSearchQuery(query: String) {
         _state.update { it.copy(searchQuery = query) }
-    }
-
-    fun updateStartDate(startDate: LocalDate) {
-        _state.update { it.copy(startDate = startDate) }
-    }
-
-    fun updateEndDate(endDate: LocalDate) {
-        _state.update { it.copy(endDate = endDate) }
     }
 
     fun updateOnlyFavorites(onlyFavorites: Boolean) {
@@ -98,24 +88,14 @@ data class EpisodeScreenState(
     val episodes: List<Episode> = emptyList(),
     val favoriteEpisodeIds: Set<String> = emptySet(),
     val searchQuery: String = "",
-    val startDate: LocalDate? = null,
-    val endDate: LocalDate? = null,
     val onlyFavorites: Boolean = false,
     val loading: Boolean = false
 ) {
     val filteredEpisodes: List<Episode>
         get() = episodes.filter { episode ->
             val matchesQuery = episode.name.contains(searchQuery, ignoreCase = true)
-            val airDate = toLocalDate(episode.airDate)
-            val withinDateRange = (startDate == null || airDate >= startDate) &&
-                    (endDate == null || airDate <= endDate)
             val isFavorite = favoriteEpisodeIds.contains(episode.id.toString())
 
-            matchesQuery && withinDateRange && (!onlyFavorites || isFavorite)
+            matchesQuery && (!onlyFavorites || isFavorite)
         }
-
-    private fun toLocalDate(dateString: String): LocalDate {
-        val formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
-        return LocalDate.parse(dateString, formatter)
-    }
 }
