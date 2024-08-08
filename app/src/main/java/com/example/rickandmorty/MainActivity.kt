@@ -16,9 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.example.rickandmorty.components.navigation_ui.Navigation
+import com.example.rickandmorty.presentation.navigation.Navigation
 import com.example.rickandmorty.data.PreferencesManager
-import com.example.rickandmorty.ui.theme.RickAndMortyTheme
+import com.example.rickandmorty.presentation.theme.RickAndMortyTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
