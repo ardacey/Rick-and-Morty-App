@@ -46,7 +46,7 @@ fun CharacterDetailsScreen(
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.Red
                 )
-            } else { CharacterDetailsHeader(state.character) }
+            } else { CharacterDetailsHeader(state.character, navController) }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -49,7 +49,7 @@ fun EpisodeDetailsScreen(
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.Red
                 )
-            } else { EpisodeDetailsHeader(state.episode) }
+            } else { EpisodeDetailsHeader(state.episode, navController) }
             Text(
                 text = "Characters (${state.characters.size})",
                 modifier = Modifier.padding(16.dp),

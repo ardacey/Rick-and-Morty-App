@@ -49,7 +49,7 @@ fun LocationDetailsScreen(
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.Red
                 )
-            } else { LocationDetailsHeader(state.location) }
+            } else { LocationDetailsHeader(state.location, navController) }
             Text(
                 text = "Residents (${state.characters.size})",
                 modifier = Modifier.padding(16.dp),
