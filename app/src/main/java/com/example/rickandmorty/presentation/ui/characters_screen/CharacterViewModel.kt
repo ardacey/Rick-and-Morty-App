@@ -12,14 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class CharacterViewModel(
-    private val repository: CharacterRepository
-) : ViewModel(), KoinComponent {
-
-    private val preferencesManager: PreferencesManager by inject()
+    private val repository: CharacterRepository,
+    private val preferencesManager: PreferencesManager
+) : ViewModel() {
 
     private val _state = MutableStateFlow(CharacterScreenState())
     val state: StateFlow<CharacterScreenState> = _state.asStateFlow()

@@ -27,9 +27,9 @@ val appModule = module {
     single<CharacterRepository> { CharacterRepositoryImpl(get()) }
     single<EpisodeRepository> { EpisodeRepositoryImpl(get()) }
     single<LocationRepository> { LocationRepositoryImpl(get()) }
-    viewModel { CharacterViewModel(get()) }
-    viewModel { EpisodeViewModel(get()) }
-    viewModel { LocationViewModel(get()) }
+    viewModel { CharacterViewModel(get(), get()) }
+    viewModel { EpisodeViewModel(get(), get()) }
+    viewModel { LocationViewModel(get(), get()) }
     viewModel {p -> CharacterDetailsViewModel(p[0], get(), get()) }
     viewModel {p -> EpisodeDetailsViewModel(p[0], get(), get()) }
     viewModel {p -> LocationDetailsViewModel(p[0], get(), get()) }

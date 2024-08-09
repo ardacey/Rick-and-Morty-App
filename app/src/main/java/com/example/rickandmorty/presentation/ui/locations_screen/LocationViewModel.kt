@@ -11,14 +11,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class LocationViewModel(
-    private val repository: LocationRepository
-) : ViewModel(), KoinComponent {
-
-    private val preferencesManager: PreferencesManager by inject()
+    private val repository: LocationRepository,
+    private val preferencesManager: PreferencesManager
+) : ViewModel() {
 
     private val _state = MutableStateFlow(LocationScreenState())
     val state: StateFlow<LocationScreenState> = _state.asStateFlow()
