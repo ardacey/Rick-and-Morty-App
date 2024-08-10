@@ -7,6 +7,8 @@ import com.example.rickandmorty.data.network.model.character.Character
 import com.example.rickandmorty.data.network.model.episode.Episode
 import com.example.rickandmorty.data.repository.CharacterRepository
 import com.example.rickandmorty.data.repository.EpisodeRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,15 +49,17 @@ class CharacterDetailsViewModel(
         _state.update { it.copy(loading = true) }
         viewModelScope.launch {
             val episodeIDs = episodeURLs.map { it.substringAfterLast("/").toInt() }
-            val episodeList = episodeIDs.flatMap { id ->
-                when (val response = episodeRepository.getEpisode(id)) {
-                    is AppResult.Success -> listOf(response.successData)
-                    is AppResult.Error -> emptyList()
+            val deferredResults = episodeIDs.map { id ->
+                async {
+                    when (val response = episodeRepository.getEpisode(id)) {
+                        is AppResult.Success -> listOf(response.successData)
+                        is AppResult.Error -> emptyList()
+                    }
                 }
             }
 
-            _state.update { it.copy(episodes = episodeList) }
-            _state.update { it.copy(loading = false) }
+            val episodeList = deferredResults.awaitAll().flatten()
+            _state.update { it.copy(episodes = episodeList, loading = false) }
         }
     }
 }

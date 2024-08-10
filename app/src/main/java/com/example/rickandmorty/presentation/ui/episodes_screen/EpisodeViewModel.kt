@@ -6,6 +6,8 @@ import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.data.network.model.basemodel.AppResult
 import com.example.rickandmorty.data.network.model.episode.Episode
 import com.example.rickandmorty.data.repository.EpisodeRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,19 +66,21 @@ class EpisodeViewModel(
             when (val firstPageResult = repository.getEpisodeList(1)) {
                 is AppResult.Success -> {
                     val totalPages = firstPageResult.successData.info.pages
-                    episodeList = (1..totalPages).flatMap { page ->
-                        when (val response = repository.getEpisodeList(page)) {
-                            is AppResult.Success -> response.successData.results
-                            is AppResult.Error -> emptyList()
+                    val deferredResults = (2..totalPages).map { page ->
+                        async {
+                            when (val response = repository.getEpisodeList(page)) {
+                                is AppResult.Success -> response.successData.results
+                                is AppResult.Error -> emptyList()
+                            }
                         }
                     }
+                    episodeList = firstPageResult.successData.results + deferredResults.awaitAll().flatten()
                 }
                 is AppResult.Error -> {
                     _error.value = firstPageResult.message
                 }
             }
-            _state.update { it.copy(episodes = episodeList) }
-            _state.update { it.copy(loading = false) }
+            _state.update { it.copy(episodes = episodeList, loading = false) }
         }
     }
 }

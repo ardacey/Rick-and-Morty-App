@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.rickandmorty.presentation.ui.characters_screen.components.CharacterBottomSheet
 import com.example.rickandmorty.presentation.ui.characters_screen.components.CharacterUI
@@ -65,7 +66,11 @@ fun CharactersScreen(
                             character = character,
                             isFavorite = isFavorite,
                             onClick = {
-                                navController.navigate(Screen.CharacterDetails.createRoute(character.id))
+                                navController.navigate(Screen.CharacterDetails.createRoute(character.id)) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        inclusive = true
+                                    }
+                                }
                             },
                             onFavoriteClick = {
                                 viewModel.toggleFavoriteCharacter(character.id.toString())

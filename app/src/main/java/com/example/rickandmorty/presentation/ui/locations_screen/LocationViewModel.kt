@@ -6,6 +6,8 @@ import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.data.network.model.basemodel.AppResult
 import com.example.rickandmorty.data.network.model.location.Location
 import com.example.rickandmorty.data.repository.LocationRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -96,19 +98,21 @@ class LocationViewModel(
             when (val firstPageResult = repository.getLocationList(1)) {
                 is AppResult.Success -> {
                     val totalPages = firstPageResult.successData.info.pages
-                    locationList = (1..totalPages).flatMap { page ->
-                        when (val response = repository.getLocationList(page)) {
-                            is AppResult.Success -> response.successData.results
-                            is AppResult.Error -> emptyList()
+                    val deferredResults = (2..totalPages).map { page ->
+                        async {
+                            when (val response = repository.getLocationList(page)) {
+                                is AppResult.Success -> response.successData.results
+                                is AppResult.Error -> emptyList()
+                            }
                         }
                     }
+                    locationList = firstPageResult.successData.results + deferredResults.awaitAll().flatten()
                 }
                 is AppResult.Error -> {
                     _error.value = firstPageResult.message
                 }
             }
-            _state.update { it.copy(locations = locationList) }
-            _state.update { it.copy(loading = false) }
+            _state.update { it.copy(locations = locationList, loading = false) }
         }
     }
 }

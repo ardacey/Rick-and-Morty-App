@@ -7,6 +7,8 @@ import com.example.rickandmorty.data.network.model.basemodel.AppResult
 import com.example.rickandmorty.data.network.model.location.Location
 import com.example.rickandmorty.data.repository.CharacterRepository
 import com.example.rickandmorty.data.repository.LocationRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,17 +49,20 @@ class LocationDetailsViewModel(
         _state.update { it.copy(loading = true) }
         viewModelScope.launch {
             val characterIDs = characterURLs.map { it.substringAfterLast("/").toInt() }
-            val characterList = characterIDs.flatMap { id ->
-                when (val response = characterRepository.getCharacter(id)) {
-                    is AppResult.Success -> listOf(response.successData)
-                    is AppResult.Error -> emptyList()
+            val deferredResults = characterIDs.map { id ->
+                async {
+                    when (val response = characterRepository.getCharacter(id)) {
+                        is AppResult.Success -> listOf(response.successData)
+                        is AppResult.Error -> emptyList()
+                    }
                 }
             }
 
-            _state.update { it.copy(characters = characterList) }
-            _state.update { it.copy(loading = false) }
+            val characterList = deferredResults.awaitAll().flatten()
+            _state.update { it.copy(characters = characterList, loading = false) }
         }
     }
+
 }
 
 data class LocationDetailsScreenState(

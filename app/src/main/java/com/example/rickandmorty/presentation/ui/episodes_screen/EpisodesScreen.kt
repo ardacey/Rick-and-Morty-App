@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.rickandmorty.presentation.ui.episodes_screen.components.EpisodeBottomSheet
 import com.example.rickandmorty.presentation.ui.episodes_screen.components.EpisodeUI
@@ -66,7 +67,11 @@ fun EpisodesScreen(
                             episode = episode,
                             isFavorite = isFavorite,
                             onClick = {
-                                navController.navigate(Screen.EpisodeDetails.createRoute(episode.id))
+                                navController.navigate(Screen.EpisodeDetails.createRoute(episode.id)) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        inclusive = true
+                                    }
+                                }
                             },
                             onFavoriteClick = {
                                 viewModel.toggleFavoriteEpisode(episode.id.toString())

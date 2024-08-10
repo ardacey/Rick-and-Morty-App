@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.rickandmorty.presentation.common.LoadingIndicator
 import com.example.rickandmorty.presentation.ui.locations_screen.components.LocationBottomSheet
@@ -66,7 +67,11 @@ fun LocationsScreen(
                             location = location,
                             isFavorite = isFavorite,
                             onClick = {
-                                navController.navigate(Screen.LocationDetails.createRoute(location.id))
+                                navController.navigate(Screen.LocationDetails.createRoute(location.id)) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        inclusive = true
+                                    }
+                                }
                             },
                             onFavoriteClick = {
                                 viewModel.toggleFavoriteLocation(location.id.toString())

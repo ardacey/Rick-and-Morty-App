@@ -6,6 +6,8 @@ import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.data.network.model.basemodel.AppResult
 import com.example.rickandmorty.data.network.model.character.Character
 import com.example.rickandmorty.data.repository.CharacterRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -105,19 +107,21 @@ class CharacterViewModel(
             when (val firstPageResult = repository.getCharacterList(1)) {
                 is AppResult.Success -> {
                     val totalPages = firstPageResult.successData.info.pages
-                    characterList = (1..totalPages).flatMap { page ->
-                        when (val response = repository.getCharacterList(page)) {
-                            is AppResult.Success -> response.successData.results
-                            is AppResult.Error -> emptyList()
+                    val deferredResults = (2..totalPages).map { page ->
+                        async {
+                            when (val response = repository.getCharacterList(page)) {
+                                is AppResult.Success -> response.successData.results
+                                is AppResult.Error -> emptyList()
+                            }
                         }
                     }
+                    characterList = firstPageResult.successData.results + deferredResults.awaitAll().flatten()
                 }
                 is AppResult.Error -> {
                     _error.value = firstPageResult.message
                 }
             }
-            _state.update { it.copy(characters = characterList) }
-            _state.update { it.copy(loading = false) }
+            _state.update { it.copy(characters = characterList, loading = false) }
         }
     }
 }

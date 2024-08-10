@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.rickandmorty.presentation.ui.character_details_screen.components.EpisodeCard
 import com.example.rickandmorty.presentation.common.LoadingIndicator
 import com.example.rickandmorty.presentation.ui.character_details_screen.components.CharacterDetailsHeader
@@ -67,8 +68,11 @@ fun CharacterDetailsScreen(
                 EpisodeCard(
                     state.episodes[index]
                 ) {
-                    navController.navigate(
-                        Screen.EpisodeDetails.createRoute(state.episodes[index].id))
+                    navController.navigate(Screen.EpisodeDetails.createRoute(state.episodes[index].id)) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }
