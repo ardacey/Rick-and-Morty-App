@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.rickandmorty.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,13 +39,7 @@ fun TopBar(
                 )
                 IconButton(
                     modifier = Modifier.padding(end = 8.dp),
-                    onClick = { navController.navigate("settings") {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    } }
+                    onClick = { navController.navigate("settings") }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
