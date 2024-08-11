@@ -19,7 +19,12 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.rickandmorty.presentation.navigation.Navigation
 import com.example.rickandmorty.data.PreferencesManager
 import com.example.rickandmorty.presentation.theme.RickAndMortyTheme
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import kotlinx.coroutines.launch
+
+private lateinit var firebaseAnalytics: FirebaseAnalytics
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +33,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val preferencesManager = PreferencesManager(this)
+        firebaseAnalytics = Firebase.analytics
 
         setContent {
             var isDarkMode by remember { mutableStateOf(false) }
