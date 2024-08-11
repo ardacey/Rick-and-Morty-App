@@ -69,8 +69,10 @@ fun LocationsScreen(
                             onClick = {
                                 navController.navigate(Screen.LocationDetails.createRoute(location.id)) {
                                     popUpTo(navController.graph.findStartDestination().id) {
-                                        inclusive = true
+                                        saveState = true
                                     }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
                             },
                             onFavoriteClick = {

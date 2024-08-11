@@ -70,8 +70,10 @@ fun CharacterDetailsScreen(
                 ) {
                     navController.navigate(Screen.EpisodeDetails.createRoute(state.episodes[index].id)) {
                         popUpTo(navController.graph.findStartDestination().id) {
-                            inclusive = true
+                            saveState = true
                         }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 }
             }

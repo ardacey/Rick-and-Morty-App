@@ -72,8 +72,10 @@ fun EpisodeDetailsScreen(
                             onClick = {
                                 navController.navigate(Screen.CharacterDetails.createRoute(character.id)) {
                                     popUpTo(navController.graph.findStartDestination().id) {
-                                        inclusive = true
+                                        saveState = true
                                     }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
                             }
                         )
