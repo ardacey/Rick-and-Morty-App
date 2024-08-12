@@ -29,7 +29,7 @@ fun CharacterCard(character: Character, onClick: () -> Unit = { }) {
             model = character.image,
             contentDescription = character.name,
             modifier = Modifier
-                .size(120.dp)
+                .size(110.dp)
                 .clip(RoundedCornerShape(10.dp)),
         )
         Text(

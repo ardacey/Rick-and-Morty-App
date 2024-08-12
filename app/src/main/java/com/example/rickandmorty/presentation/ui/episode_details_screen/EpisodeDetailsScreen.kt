@@ -1,12 +1,12 @@
 package com.example.rickandmorty.presentation.ui.episode_details_screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +24,6 @@ import com.example.rickandmorty.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EpisodeDetailsScreen(
     id : Int?,
@@ -37,35 +36,33 @@ fun EpisodeDetailsScreen(
     val state by viewModel.state.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        item {
-            if (error != null) {
-                Text(
-                    text = error!!,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
-                    style = MaterialTheme.typography.displayMedium,
-                    color = Color.Red
-                )
-            } else { EpisodeDetailsHeader(state.episode, navController) }
+        if (error != null) {
             Text(
-                text = "Characters (${state.characters.size})",
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.titleLarge,
+                text = error!!,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.Red
             )
-        }
+        } else { EpisodeDetailsHeader(state.episode, navController) }
+        Text(
+            text = "Characters (${state.characters.size})",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.titleLarge,
+        )
         if (state.loading) {
-            item { LoadingIndicator() }
+            LoadingIndicator()
         } else {
-            item {
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    maxItemsInEachRow = 3,
-                    horizontalArrangement = Arrangement.SpaceAround,
-                ) {
-                    state.characters.forEach { character ->
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxWidth(),
+                columns = GridCells.Fixed(3),
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
+                state.characters.forEach { character ->
+                    item {
                         CharacterCard(
                             character,
                             onClick = {
