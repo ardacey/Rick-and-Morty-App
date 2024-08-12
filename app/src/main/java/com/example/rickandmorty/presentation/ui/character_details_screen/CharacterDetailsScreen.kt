@@ -67,10 +67,7 @@ fun CharacterDetailsScreen(
                 EpisodeCard(
                     state.episodes[index]
                 ) {
-                    navController.navigate(Screen.EpisodeDetails.createRoute(state.episodes[index].id)) {
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigate(Screen.EpisodeDetails.createRoute(state.episodes[index].id))
                 }
             }
         }

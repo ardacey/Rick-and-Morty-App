@@ -68,12 +68,7 @@ fun EpisodeDetailsScreen(
                             CharacterCard(
                                 character = character,
                                 onClick = {
-                                    navController.navigate(
-                                        Screen.CharacterDetails.createRoute(character.id)
-                                    ) {
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
+                                    navController.navigate(Screen.CharacterDetails.createRoute(character.id))
                                 }
                             )
                         }
