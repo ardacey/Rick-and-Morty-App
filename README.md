@@ -13,11 +13,16 @@ Rick and Morty app built with modern Android development tools. This app allows 
   * Each screen includes a favorites section to view and manage your selections.
 * Dark Mode:
   * This app supports dark mode, automatically adjusting the UI based on user preferences.
- 
-<img src="https://github.com/user-attachments/assets/ed91d4db-6038-4e5b-9a1a-91c45189d60a" width="40%">
-<img src="https://github.com/user-attachments/assets/af8fd386-bc7f-4861-9dc1-ba7a2b6e8474" width="40%">
-<img src="https://github.com/user-attachments/assets/639e32ce-01db-4630-8415-a1cee1c88e46" width="40%">
-<img src="https://github.com/user-attachments/assets/47834b07-da07-42ab-ae11-211de71f382e" width="40%">
+
+<p>
+ <img src="https://github.com/user-attachments/assets/ed91d4db-6038-4e5b-9a1a-91c45189d60a" width="25%">
+ <img src="https://github.com/user-attachments/assets/af8fd386-bc7f-4861-9dc1-ba7a2b6e8474" width="25%">
+</p>
+<p>
+ <img src="https://github.com/user-attachments/assets/639e32ce-01db-4630-8415-a1cee1c88e46" width="25%">
+ <img src="https://github.com/user-attachments/assets/47834b07-da07-42ab-ae11-211de71f382e" width="25%">
+</p>
+
 
 ## 🚀 Architecture & Technologies
 * Minimum SDK level 26
