@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.rickandmorty.data.network.model.episode.Episode
@@ -52,6 +53,7 @@ fun EpisodeDetailsHeader(
             text = episode.name,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
         )
         Text(
             text = episode.airDate,
