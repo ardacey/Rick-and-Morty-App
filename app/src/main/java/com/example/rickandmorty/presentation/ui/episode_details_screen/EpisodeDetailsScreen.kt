@@ -61,8 +61,7 @@ fun EpisodeDetailsScreen(
                 val gridRows = state.characters.chunked(3)
                 gridRows.forEach { row ->
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 8.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         row.forEach { character ->
