@@ -1,12 +1,11 @@
 package com.example.rickandmorty.presentation.ui.location_details_screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,46 +35,49 @@ fun LocationDetailsScreen(
     val state by viewModel.state.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    Column(
+    LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (error != null) {
+        item {
+            if (error != null) {
+                Text(
+                    text = error!!,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
+                    style = MaterialTheme.typography.displayMedium,
+                    color = Color.Red
+                )
+            } else { LocationDetailsHeader(state.location, navController) }
             Text(
-                text = error!!,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
-                style = MaterialTheme.typography.displayMedium,
-                color = Color.Red
+                text = "Residents (${state.characters.size})",
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.titleLarge,
             )
-        } else { LocationDetailsHeader(state.location, navController) }
-        Text(
-            text = "Residents (${state.characters.size})",
-            modifier = Modifier.padding(16.dp),
-            style = MaterialTheme.typography.titleLarge,
-        )
+        }
         if (state.loading) {
-            LoadingIndicator()
+            item { LoadingIndicator() }
         } else {
-            LazyVerticalGrid(
-                modifier = Modifier.fillMaxWidth(),
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.SpaceAround,
-            ) {
-                state.characters.forEach { character ->
-                    item {
-                        CharacterCard(
-                            character,
-                            onClick = {
-                                navController.navigate(
-                                    Screen.CharacterDetails.createRoute(
-                                        character.id
-                                    )
-                                ) {
-                                    launchSingleTop = true
-                                    restoreState = true
+            item {
+                val gridRows = state.characters.chunked(3)
+                gridRows.forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        row.forEach { character ->
+                            CharacterCard(
+                                character = character,
+                                onClick = {
+                                    navController.navigate(
+                                        Screen.CharacterDetails.createRoute(character.id)
+                                    ) {
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
